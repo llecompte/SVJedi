@@ -35,7 +35,7 @@ Also, the `SVLEN` tag must be present in the VCF.
 
 ### Installation
 
-    git clone https://gitlab.inria.fr/llecompt/SVJedi
+    git clone https://github.com/llecompte/SVJedi.git
 
 ### Example
 
