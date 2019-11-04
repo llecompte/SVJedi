@@ -44,7 +44,7 @@ def main(args):
     genome_file = args.ref[0]
     vcf_file = args.vcf[0]
 
-    create_ref(genome_file, sv_file)
+    create_ref(genome_file, vcf_file)
 
 
 def create_ref(genome, set_of_sv):
