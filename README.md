@@ -1,4 +1,4 @@
-# SVJedi : genotyping structural variations with long read data
+# SVJedi : Genotyping structural variations with long read data
 
 [![License](http://img.shields.io/:license-affero-blue.svg)](http://www.gnu.org/licenses/agpl-3.0.en.html)
 
