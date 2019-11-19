@@ -4,8 +4,8 @@
 
 SVJedi is a structural variation (SV) genotyper for long read data. 
 Based on a representation of the different alleles, it estimates the genotype of each variant from specific alignements obtained.
-SVJedi takes as input a *variant file* (vcf), a *reference genome* (fasta) and a *long read file* (fasta/fastq) and 
-outputs the initial variant file with an additional column containing genotyping information (vcf).
+SVJedi takes as input a *variant file* (VCF), a *reference genome* (fasta) and a *long read file* (fasta/fastq) and 
+outputs the initial variant file with an additional column containing genotyping information (VCF).
 
 For the moment, SVJedi process **deletions** and **insertions**.
 
@@ -22,6 +22,7 @@ SVJedi is organized in three main steps:
 
 - Python3
 - Minimap2
+- numpy
 
 
 ### Usage
