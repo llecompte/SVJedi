@@ -1,20 +1,19 @@
-# SVJedi : genotyping structural variation using long reads data
+# SVJedi : genotyping structural variations with long read data
 
 [![License](http://img.shields.io/:license-affero-blue.svg)](http://www.gnu.org/licenses/agpl-3.0.en.html)
 
-SVJedi is a structural variation (SV) genotyper for long reads data. 
+SVJedi is a structural variation (SV) genotyper for long read data. 
 Based on a representation of the different alleles, it estimates the genotype of each variant from specific alignements obtained.
 SVJedi takes as input a *variant file* (vcf), a *reference genome* (fasta) and a *long read file* (fasta/fastq) and 
 outputs the initial variant file with an additional column containing genotyping information (vcf).
 
-For the moment, SVJedi only applies to **deletions**. 
+For the moment, SVJedi process **deletions** and **insertions**.
 
 SVJedi is organized in three main steps:
 
 1. Generate allele reference sequences of a set of deletions given in a vcf file
 2. Map reads on previously generated references using Minimap2
 3. Genotype deletions and output a vcf
-
 
 *Jedi comes from the verb jediñ* ['ʒeːdɪ] *in Breton, it means calculate.*
 
@@ -27,10 +26,10 @@ SVJedi is organized in three main steps:
 
 ### Usage
 
-    python3 svjedi.py -v <set_of_deletions.vcf> -r <reference.fasta> -i <long_reads.fastq>
+    python3 svjedi.py -v <set_of_sv.vcf> -r <reference.fasta> -i <long_reads.fastq>
     
-Note: Chromosome names in `reference.fasta` and in `set_of_deletions.vcf` must be the same.
-Also, the `SVLEN` tag must be present in the VCF.
+Note: Chromosome names in `reference.fasta` and in `set_of_sv.vcf` must be the same. 
+Also, the `SVTYPE` tag must be present in the VCF (`SVTYPE=DEL` or as `SVTYPE=INS`).
 
 
 ### Installation
@@ -52,13 +51,14 @@ Example command line:
 SVJedi two different usages from non aligned reads or from aligned reads (PAF format).
 
 ```
-    python3 svjedi.py -v <set_of_deletions.vcf> -r <reference.fasta> -i <long_reads.fastq>
+    python3 svjedi.py -v <set_of_sv.vcf> -r <reference.fasta> -i <long_reads.fastq>
     
-    python3 svjedi.py -v <set_of_deletion.vcf> -p <alignments.paf>
+    python3 svjedi.py -v <set_of_sv.vcf> -p <alignments.paf>
 ```
+
 | Option       | Description                               |
 | ------------ | ----------------------------------------- | 
-| -v/--vcf     | set of deletions in VCF                   |
+| -v/--vcf     | set of SVs in VCF                   |
 | -r/--ref     | reference genome in FASTA                 |
 | -i/--input   | sequenced long reads in FASTQ or FASTQ.GZ (1 file or multiple files)|
 | -p/--paf     | alignments in PAF                         |
