@@ -23,7 +23,6 @@
 
 *******************************************************************************"""
 
-
 import sys
 import argparse
 
@@ -51,6 +50,7 @@ def create_ref(genome, set_of_sv):
     """ Generate triplet of reference """
     dict_of_chrom = {}
     list_of_deletions = []
+    list_of_insertions = []
 
     # original sequence ref required
     with open(genome) as sequenceFile:
@@ -71,8 +71,8 @@ def create_ref(genome, set_of_sv):
     previous_start = 0
     previous_end = 0
 
-    with open(set_of_sv) as deletionFile:
-        for line in deletionFile:
+    with open(set_of_sv) as svFile:
+        for line in svFile:
             if not line.startswith("#"):
                 if len(line.split("\t")) > 6:
                     chrom, start, _, __, type_sv, ___, ____, info, *_ = line.rstrip(
@@ -82,33 +82,42 @@ def create_ref(genome, set_of_sv):
                     chrom, start, _, __, type_sv, ___, ____, info = line.rstrip(
                         "\n"
                     ).split("\t")
+                                
+                #for deletions
+                if type_sv == "<DEL>" or info.split('SVTYPE=')[1].split(';')[0] == 'DEL':
+                
+                    start = int(start)
+                    length = abs(int(info.split("SVLEN=")[1].split(";")[0]))
+                    end = start + length
 
-                # focus on deletion only
-                if type_sv != "<DEL>":
-                    continue
+                    # focus on >=50bp length deletion
+                    if length >= 50:
+                        list_of_deletions.append((chrom, start, end, length))
+                
+                           
+                #for insertion
+                if info.split('SVTYPE=')[1].split(';')[0] == 'INS':
+                    start = int(start)
+                    length = len(type_sv)
+                                
+                    # focus on >=50bp length insertion
+                    if length >= 50:
+                        list_of_insertions.append((chrom, start, length, type_sv))
 
-                start = int(start)
-                length = abs(int(info.split("SVLEN=")[1].split(";")[0]))
-                end = start + length
-
-                # focus on >=50bp length deletion
-                if length < 50:
-                    continue
-
-                list_of_deletions.append((chrom, start, end, length))
 
     # output files
     filename_normal = "reference_at_breakpoints.fasta"
 
     f1 = open(filename_normal, "w")
     for d in list_of_deletions:
-        define_references(f1, dict_of_chrom, d)
+        define_references_for_deletions(f1, dict_of_chrom, d)
+    for i in list_of_insertions:
+        define_references_for_insertions(f1, dict_of_chrom, i)
     f1.close()
 
 
-def define_references(out1, genome, deletion):
+def define_references_for_deletions(out1, genome, deletion):
     """ Define the reference duplet """
-
     ch, s, e, l = deletion
     if abs(l) <= 10000:
         ### breakpoint withOUT deletion
@@ -132,6 +141,39 @@ def define_references(out1, genome, deletion):
     seq_del = genome[ch][s - 5001 : s]
     seq_del += genome[ch][e : e + 5000]
     out1.write(header_seq + seq_del + "\n")
+
+
+def define_references_for_insertions(out1, genome, insertion):
+    """ Define the reference duplet """
+    ch, s, l, sequence = insertion
+    
+    #Ref
+    header_seq = ">ref_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
+    seq_ins = genome[ch][s - 5000 : s]
+    seq_ins += genome[ch][s : s + 5000]
+    out1.write(header_seq + seq_ins + "\n")
+    
+       
+    if abs(l) <= 10000:
+        ### breakpoint with insertion
+        header = ">ins_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
+        seq = genome[ch][s - 5000 : s]
+        seq += sequence
+        seq += genome[ch][s:s + 5000]
+        out1.write(header + seq + "\n")
+
+    else:
+        # left breakpoint with insertion
+        header = ">insLeft_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
+        seq = genome[ch][s - 5000 : s]
+        seq += sequence[:5000]
+        out1.write(header + seq + "\n")
+
+        # right breakpoint with insertion
+        header = ">insRight_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
+        seq = sequence[-5000:]
+        seq += genome[ch][s: s + 5000]
+        out1.write(header + seq + "\n")
 
 
 if __name__ == "__main__":

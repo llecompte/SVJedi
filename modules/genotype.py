@@ -24,7 +24,10 @@
 *******************************************************************************"""
 
 import sys
+import numpy as np
 import argparse
+import math
+from decimal import *
 from modules import entry
 from modules import rules
 
@@ -77,7 +80,7 @@ def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end):
         for line in file:
             readId, readLength, readStart, readEnd, _, refId, refLength, refStart, refEnd, match, blockLength, quality, *_ = line.split("\t")
             refSV = (refId.split("_")[1] + "_" + refId.split("_")[-1]) # ex: ref_2_48990527-636
-            deletionLength = abs(int(refId.split("-")[-1]))
+            svLength = abs(int(refId.split("-")[-1]))
 
             readLength, readStart, readEnd = (int(readLength), int(readStart), int(readEnd))
             refLength, refStart, refEnd = int(refLength), int(refStart), int(refEnd)
@@ -88,7 +91,7 @@ def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end):
             if int(quality) < 10:
                 continue
             # Overlapping filter : Test if read align on one of the junctions
-            if (refStart + d_over) < 5000 < (refEnd - d_over) or (refStart + d_over) < (5000 + deletionLength) < (refEnd - d_over):
+            if (refStart + d_over) < 5000 < (refEnd - d_over) or (refStart + d_over) < (5000 + svLength) < (refEnd - d_over):
                 # Rules filter
                 if rules.all_rules(aln, d_end):
                     fill_sv_dict(aln, dict_of_informative_aln)
@@ -148,8 +151,20 @@ def fill_sv_dict(a, dictReadAtJunction):
             dictReadAtJunction[svId][1].append(read)
 
 
+
+def encode_genotype(g):
+    ''' Encode genotype from 0, 1, 2 to 0/0, 0/1, 1/1 '''
+    if g == '0': genotype = "0/0"
+    elif g == '1': genotype = "0/1"
+    elif g == '2': genotype = "1/1"
+    
+    return genotype
+
+
+
 def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
     """ Output in VCF format and take genotype decision """
+    getcontext().prec = 28
     outDecision = open(outputDecision, "w")
     with open(inputVCF) as inputFile:
         for line in inputFile:
@@ -165,73 +180,117 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
             else:
                 in_chrom, in_start, _, __, in_type, ___, ____, in_info, *_ = line.rstrip("\n").split("\t")
 
-                if in_type != "<DEL>":
-                    continue
 
-                if "SVLEN=FALSE" in in_info:
-                    if in_info.startswith("END="):
-                        end = in_info.split("END=")[1].split(";")[0]
-                    else:
-                        end = in_info.split(";END=")[1].split(";")[0]
+                svtype = in_info.split('SVTYPE=')[1].split(';')[0]
+                if svtype == 'DEL': #retrive svlength for deletion
+                    if "SVLEN=FALSE" in in_info:
+                        if in_info.startswith("END="):
+                            end = in_info.split("END=")[1].split(";")[0]
+                        else:
+                            end = in_info.split(";END=")[1].split(";")[0]
 
-                    in_length = abs(int(end) - int(start))
+                        in_length = abs(int(end) - int(start))
 
-                elif "SVLEN=" in in_info:
-                    in_length = abs(int(in_info.split("SVLEN=")[1].split(";")[0]))
-
-                if abs(in_length) < 50:
-                    continue
+                    elif "SVLEN=" in in_info:
+                        in_length = abs(int(in_info.split("SVLEN=")[1].split(";")[0]))
+                
+                elif svtype == 'INS': #retrive svlength for insertion
+                    in_length = len(in_type)
+                    
+                if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
 
                 in_sv = in_chrom + "_" + in_start + "-" + str(in_length)
                 if in_sv not in list(dictReadAtJunction.keys()):
-                    continue
+                    nbAln = [0,0]
+                    geno = "./."
+                    prob = [".",".","."]
+                                       
+                else:
+                    nbAln = [len(x) for x in dictReadAtJunction[in_sv]]
 
-                nbAln = [len(x) for x in dictReadAtJunction[in_sv]]
+                    # normalization
+                    if svtype == "DEL":         
+                        nbAln_prev = nbAln[0]
+                        if nbAln[0] != 0:
+                            nbAln[0] = round(nbAln_prev * 10000 / (10000 + in_length), 3)
+                            
+                    elif svtype == "INS":
+                        nbAln_prev = nbAln[1]
+                        if nbAln[1] != 0:
+                            nbAln[1] = round(nbAln_prev * 10000 / (10000 + in_length), 3)
+                    
+                    prior_het = 1/3
+                    c1, c2 = nbAln
+                    rc1 = int(round(c1,0))
+                    rc2 = int(round(c2,0))
+                    e = 0.00005
+                
+                    lik0 = Decimal(c1*math.log10(1-e)) + Decimal(c2*math.log10(e)) 
+                    lik1 = Decimal((c1+c2)*math.log10(1/2)) 
+                    lik2 = Decimal(c2*math.log10(1-e)) + Decimal(c1*math.log10(e))
+                    
+                    lik0 += Decimal(math.log10((1-prior_het)/2))
+                    lik1 += Decimal(math.log10(prior_het))
+                    lik2 += Decimal(math.log10((1-prior_het/2)))
+                    
+                    L = [lik0, lik1, lik2]
+                    
+                    index_of_L_max = [i for i, x in enumerate(L) if x == max(L)]
+                    if len(index_of_L_max) == 1: geno_not_encoded = str(index_of_L_max[0])
+                    else:print('Multiple index with same value', L)
+                    
+                    geno = encode_genotype(geno_not_encoded)
+                    
+                    combination = Decimal(math.factorial(rc1 + rc2)) / Decimal(math.factorial(rc1)) / Decimal(math.factorial(rc2))
+                    lik0 += combination 
+                    lik1 += combination
+                    lik2 += combination
 
-                # normalization
-                nbAln_prev = nbAln[0]
-                if nbAln[0] != 0:
-                    nbAln[0] = round(nbAln_prev * 10000 / (10000 + in_length), 3)
-
-                # genotype estimation
-                if (0.2 <= (nbAln[0] / (nbAln[0] + nbAln[1])) <= 0.8):
-                    geno = "0/1"
-                elif nbAln[0] > nbAln[1]:
-                    geno = "0/0"
-                elif nbAln[0] < nbAln[1]:
-                    geno = "1/1"
+                    #phred scaled score
+                    prob0 = -10*lik0
+                    prob1 = -10*lik1
+                    prob2 = -10*lik2                                 
+                                 
+                    prob = [str(int(prob0)), str(int(prob1)), str(int(prob2))]
 
                 # minimum support
-                if sum(nbAln) >= minNbAln:
-                    numbers = ",".join(str(y) for y in nbAln)
-                    if len(line.split("\t")) <= 8:
-                        new_line = (
-                            line.rstrip("\n")
-                            + "\t"
-                            + "GT:DP:AD"
-                            + "\t"
-                            + geno
-                            + ":"
-                            + str(round(sum(nbAln), 3))
-                            + ":"
-                            + str(numbers)
-                        )
-                        outDecision.write(new_line + "\n")
+                if not sum(nbAln) >= minNbAln:
+                    geno = "./."
+                    
+                numbers = ",".join(str(y) for y in nbAln)
+                if len(line.split("\t")) <= 8:
+                    new_line = (
+                        line.rstrip("\n")
+                        + "\t"
+                        + "GT:DP:AD:PL"
+                        + "\t"
+                        + geno
+                        + ":"
+                        + str(round(sum(nbAln), 3))
+                        + ":"
+                        + str(numbers)
+                        + ":"
+                        + str(','.join(prob))
+                    )
+                    outDecision.write(new_line + "\n")
 
-                    else:
-                        line_without_genotype = line.split("\t")[0:8]
-                        new_line = (
-                            "\t".join(line_without_genotype)
-                            + "\t"
-                            + "GT:DP:AD"
-                            + "\t"
-                            + geno
-                            + ":"
-                            + str(round(sum(nbAln), 3))
-                            + ":"
-                            + str(numbers)
-                        )
-                        outDecision.write(new_line + "\n")
+                else:
+                    line_without_genotype = line.split("\t")[0:8]
+                    new_line = (
+                        "\t".join(line_without_genotype)
+                        + "\t"
+                        + "GT:DP:AD:PL"
+                        + "\t"
+                        + geno
+                        + ":"
+                        + str(round(sum(nbAln), 3))
+                        + ":"
+                        + str(numbers)
+                        + ":"
+                        + str(','.join(prob))
+                    )
+                    outDecision.write(new_line + "\n")
+
     outDecision.close()
 
 
