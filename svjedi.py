@@ -23,7 +23,8 @@
 
 *******************************************************************************"""
 
-import os
+import os.path
+from os import path
 import sys
 import subprocess
 import shlex
@@ -117,8 +118,16 @@ def main(args):
 
     if args.threads is not None:
         threads = args.threads
-
+        
     alleleref_file = args.allele[0]
+    f = open(alleleref_file, "r")
+    if not path.exists(alleleref_file):
+        sys.exit("User must provide an existing ALLELEREF file")
+
+    elif not f.readline().startswith('>'):
+        sys.exit("User must provide an existing ALLELEREF file in FASTA format")
+    f.close()
+    
     data_type = args.data
     min_support = args.minsupport
     min_support = args.minsupport
