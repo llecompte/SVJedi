@@ -36,7 +36,9 @@ def parse_arguments(args):
     parser = argparse.ArgumentParser(description="Structural variations genotyping using long reads")
     parser.add_argument("-v", "--vcf", metavar="<vcffile>", help="vcf format", required=True)
 
-    parser.add_argument("-r", "--ref", metavar="<reffile>", nargs=1, help="fasta format")
+    parser.add_argument("-r", "--ref", metavar="<refgenomefile>", nargs=1, help="fasta format")
+    
+    parser.add_argument("-a", "--allele", metavar="<refallelefile>", nargs=1, default="reference_at_breakpoints.fasta", help="fasta format")
 
     parser.add_argument("-i", "--input", metavar="<readfile>", nargs="*", help="reads")
 
@@ -75,24 +77,32 @@ def parse_arguments(args):
 
 def main(args):
     """ Pipeline for genotyping SVs """
-    launch_ref, launch_align = True, True
+    
     args = parse_arguments(args)  # parse arguments
 
     # check if all required arguments are provided
     if not any(
         [
             all([arg is not None for arg in [args.vcf, args.ref, args.input]]),
+            all([arg is not None for arg in [args.vcf, args.allele, args.input]]),
             all([args.paf is not None, args.vcf is not None]),
         ]
     ):
         sys.exit(
-            "User must provide either VCF and REF and READS files OR only PAF file"
+            "User must provide either VCF and REF and READS files OR VCF and ALLELEREF and READS OR VCF and PAF file"
         )
 
     if all([arg is not None for arg in [args.vcf, args.ref, args.input]]):
         vcf_file = args.vcf
         ref_file = args.ref[0]
         reads_file = args.input
+        launch_ref, launch_align = True, True
+
+    elif all([arg is not None for arg in [args.vcf, args.allele, args.input]]):
+        vcf_file = args.vcf
+        alleleref_file = args.allele[0]
+        reads_file = args.input
+        launch_ref, launch_align = False, True
 
     elif args.paf is not None:
         vcf_file = args.vcf
@@ -108,6 +118,7 @@ def main(args):
     if args.threads is not None:
         threads = args.threads
 
+    alleleref_file = args.allele[0]
     data_type = args.data
     min_support = args.minsupport
     min_support = args.minsupport
@@ -132,7 +143,7 @@ def main(args):
                 + " -t "
                 + threads
                 + " "
-                + "reference_at_breakpoints.fasta"
+                + alleleref_file
                 + " "
                 + " ".join(reads_file)
             )
@@ -142,7 +153,7 @@ def main(args):
                 + "map-"
                 + str(data_type)
                 + " "
-                + "reference_at_breakpoints.fasta"
+                + alleleref_file
                 + " "
                 + " ".join(reads_file)
             )

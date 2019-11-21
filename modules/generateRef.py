@@ -82,6 +82,7 @@ def create_ref(genome, set_of_sv):
                     chrom, start, _, __, type_sv, ___, ____, info = line.rstrip(
                         "\n"
                     ).split("\t")
+                    
                                 
                 #for deletions
                 if type_sv == "<DEL>" or info.split('SVTYPE=')[1].split(';')[0] == 'DEL':
@@ -96,7 +97,7 @@ def create_ref(genome, set_of_sv):
                 
                            
                 #for insertion
-                if info.split('SVTYPE=')[1].split(';')[0] == 'INS':
+                elif info.split('SVTYPE=')[1].split(';')[0] == 'INS':
                     start = int(start)
                     length = len(type_sv)
                                 
