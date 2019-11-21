@@ -27,7 +27,7 @@ SVJedi is organized in three main steps:
 
 ### Usage
 
-    python3 svjedi.py -v <set_of_sv.vcf> -r <reference.fasta> -i <long_reads.fastq>
+    python3 svjedi.py -v <set_of_sv.vcf> -r <refgenome.fasta> -i <long_reads.fastq>
     
 Note: Chromosome names in `reference.fasta` and in `set_of_sv.vcf` must be the same. 
 Also, the `SVTYPE` tag must be present in the VCF (`SVTYPE=DEL` or as `SVTYPE=INS`).
@@ -52,24 +52,27 @@ Example command line:
 SVJedi two different usages from non aligned reads or from aligned reads (PAF format).
 
 ```
-    python3 svjedi.py -v <set_of_sv.vcf> -r <reference.fasta> -i <long_reads.fastq>
+    python3 svjedi.py -v <set_of_sv.vcf> -r <refgenome.fasta> -i <long_reads.fastq>
+    
+    python3 svjedi.py -v <set_of_sv.vcf> -a <refallele.fasta> -i <long_reads.fastq>
     
     python3 svjedi.py -v <set_of_sv.vcf> -p <alignments.paf>
 ```
 
 | Option       | Description                               |
 | ------------ | ----------------------------------------- | 
-| -v/--vcf     | set of SVs in VCF                   |
-| -r/--ref     | reference genome in FASTA                 |
-| -i/--input   | sequenced long reads in FASTQ or FASTQ.GZ (1 file or multiple files)|
-| -p/--paf     | alignments in PAF                         |
-| -o/--output  | output file with genotypes in VCF                |
-| -ms/--minsupport | minimum number of informative alignments to assign a genotype
+| -v/--vcf     | Set of SVs in VCF                         |
+| -r/--ref     | Reference genome in FASTA                 |
+| -i/--input   | Sequenced long reads in FASTQ or FASTQ.GZ (1 file or multiple files)|
+| -a/--allele  | Reference sequences of alleles            |
+| -p/--paf     | Alignments in PAF                         |
+| -o/--output  | Output file with genotypes in VCF         |
+| -ms/--minsupport | Minimum number of informative alignments to assign a genotype
 | -dover       | Breakpoint distance overlap required (default 100 bp) |
 | -dend        | Soft-clipping length allowed to consider a semi-global alignment (default 100 bp) |
-| -d/--data    | type of sequencing data, either *ont* or *pb* (default pb)  |
-| -t/--threads | number of threads for mapping             |
-| -h/--help    | show help                                 |
+| -d/--data    | Type of sequencing data, either *ont* or *pb* (default pb)  |
+| -t/--threads | Number of threads for mapping             |
+| -h/--help    | Show help                                 |
 
 
 ### Contact
