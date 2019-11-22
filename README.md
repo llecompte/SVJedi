@@ -77,4 +77,5 @@ SVJedi two different usages from non aligned reads or from aligned reads (PAF fo
 
 ### Contact
 
-<lolita.lecompte@inria.fr>
+SVJedi is a [Genscale](http://team.inria.fr/genscale/) tool developed by Lolita Lecompte <lolita.lecompte@inria.fr>
+
