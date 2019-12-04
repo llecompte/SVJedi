@@ -39,7 +39,7 @@ def parse_arguments(args):
 
     parser.add_argument("-r", "--ref", metavar="<refgenomefile>", nargs=1, help="fasta format")
     
-    parser.add_argument("-a", "--allele", metavar="<refallelefile>", nargs=1, default="reference_at_breakpoints.fasta", help="fasta format")
+    parser.add_argument("-a", "--allele", metavar="<refallelefile>", nargs=1, help="fasta format")
 
     parser.add_argument("-i", "--input", metavar="<readfile>", nargs="*", help="reads")
 
@@ -118,15 +118,19 @@ def main(args):
 
     if args.threads is not None:
         threads = args.threads
-        
-    alleleref_file = args.allele[0]
-    f = open(alleleref_file, "r")
-    if not path.exists(alleleref_file):
-        sys.exit("User must provide an existing ALLELEREF file")
 
-    elif not f.readline().startswith('>'):
-        sys.exit("User must provide an existing ALLELEREF file in FASTA format")
-    f.close()
+    if args.allele is None:
+        alleleref_file = "reference_at_breakpoints.fasta"   
+    else:
+        alleleref_file = args.allele[0]    
+    
+        f = open(alleleref_file, "r")
+        if not path.exists(alleleref_file):
+            sys.exit("User must provide an existing ALLELEREF file")
+
+        elif not f.readline().startswith('>'):
+            sys.exit("User must provide an existing ALLELEREF file in FASTA format")
+        f.close()
     
     data_type = args.data
     min_support = args.minsupport
