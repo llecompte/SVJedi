@@ -4,9 +4,9 @@
 
 #Dataset
 - Individual : HG002 (NA24385)
-- Long reads : set of PacBio reads provided by GiaB consortium (PacBio Mt Sinai NIST, ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/PacBio_MtSinai_NIST/)
-- Reference genome : GRCh37.p13
-- VCF file, set of 20 genotyped SVs : it is a subsample of the v0.6 SV benchmark set, described in Zook et al. "A robust benchmark for germline structural variant detection." BioRxiv (2019): 664623 (ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/HG002_SVs_Tier1_v0.6.vcf.gz). This set contains 10 insertions and 10 deletions.
+- PacBio_reads_set.fastq.gz : this file is a set of PacBio reads provided by GiaB consortium (PacBio Mt Sinai NIST, ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/PacBio_MtSinai_NIST/).
+- reference_at_breakpoints.fasta : this file is the reference of the allele sequences, obtained after running 1st SVJedi module on the GRCh37.p13 reference genome.
+- HG002_20SVs_Tier1_v0.6_PASS.vcf : this VCF file is a subsample of 20 genotyped SV from the v0.6 SV benchmark set, described in Zook et al. "A robust benchmark for germline structural variant detection." BioRxiv (2019): 664623 (ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/HG002_SVs_Tier1_v0.6.vcf.gz). This set contains 10 insertions and 10 deletions.
 
 
 #To run SVJedi on this dataset

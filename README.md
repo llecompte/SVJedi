@@ -42,6 +42,7 @@ Also, the `SVTYPE` tag must be present in the VCF (`SVTYPE=DEL` or as `SVTYPE=IN
 The folder Data/HG002_son includes an example of 20 SVs (10 insertions and 10 deletions) to genotype on a subsample of a real human dataset of the Ashkenazim son HG002.
 
 Example command line:
+
 	python3 svjedi.py -v Data/HG002_son/HG002_20SVs_Tier1_v0.6_PASS.vcf -a Data/HG002_son/reference_at_breakpoints.fasta -i Data/HG002_son/PacBio_reads_set.fastq.gz -o Data/HG002_son/genotype_results.vcf
 
 
