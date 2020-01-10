@@ -60,7 +60,7 @@ def create_ref(genome, set_of_sv):
                 if sequence != "":
                     dict_of_chrom[header] = sequence
                 sequence = ""
-                header = line.rstrip("\n")[1:]
+                header = line.rstrip("\n")[1:].split()[0]
 
             else:
                 sequence += line.rstrip("\n")
