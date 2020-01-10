@@ -39,11 +39,17 @@ Also, the `SVTYPE` tag must be present in the VCF (`SVTYPE=DEL` or as `SVTYPE=IN
 
 ### Example
 
-The folder Data includes an example on 5 deletions to genotype with a small synthetic read dataset on *Caenorhabditis elegans*.
+The folder Data/HG002_son includes an example of 20 SVs (10 insertions and 10 deletions) to genotype on a subsample of a real human dataset of the Ashkenazim son HG002.
+
+Example command line:
+	python3 svjedi.py -v Data/HG002_son/HG002_20SVs_Tier1_v0.6_PASS.vcf -a Data/HG002_son/reference_at_breakpoints.fasta -i Data/HG002_son/PacBio_reads_set.fastq.gz -o Data/HG002_son/genotype_results.vcf
+
+
+The folder Data/C_elegans includes an example on 5 deletions to genotype with a small synthetic read dataset on *Caenorhabditis elegans*.
 
 Example command line:
 
-    python3 svjedi.py -v Data/5del_C_elegans.vcf -r Data/C_elegans.chr.I.fa -i Data/reads_C_elegans.fastq.gz -o 5del_C_elegans_with_genotypes.vcf
+    python3 svjedi.py -v Data/C_elegans/5del_C_elegans.vcf -r Data/C_elegans/C_elegans.chr.I.fa -i Data/C_elegans/reads_C_elegans.fastq.gz -o Data/C_elegans/5del_C_elegans_with_genotypes.vcf
 
 
 

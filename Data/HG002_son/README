@@ -1,0 +1,20 @@
+#README
+#Test dataset of 20 human SVs 
+#2020-01-10
+
+#Dataset
+- Individual : HG002 (NA24385)
+- Long reads : set of PacBio reads provided by GiaB consortium (PacBio Mt Sinai NIST, ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/HG002_NA24385_son/PacBio_MtSinai_NIST/)
+- Reference genome : GRCh37.p13
+- VCF file, set of 20 genotyped SVs : it is a subsample of the v0.6 SV benchmark set, described in Zook et al. "A robust benchmark for germline structural variant detection." BioRxiv (2019): 664623 (ftp://ftp-trace.ncbi.nlm.nih.gov/giab/ftp/data/AshkenazimTrio/analysis/NIST_SVs_Integration_v0.6/HG002_SVs_Tier1_v0.6.vcf.gz). This set contains 10 insertions and 10 deletions.
+
+
+#To run SVJedi on this dataset
+python3 ../../svjedi.py -v HG002_20SVs_Tier1_v0.6_PASS.vcf -a reference_at_breakpoints.fasta -i PacBio_reads_set.fastq.gz
+
+#Genotype results are obtained in genotype_results.vcf file. Expected genotype results are given in expected_genotype_results.vcf file.
+
+ 
+
+
+
