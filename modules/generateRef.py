@@ -119,61 +119,66 @@ def create_ref(genome, set_of_sv):
 
 def define_references_for_deletions(out1, genome, deletion):
     """ Define the reference duplet """
+    local_seq_size = 10000 #size of the generated allelic sequence
+    side_length = int(local_seq_size / 2)
     ch, s, e, l = deletion
-    if abs(l) <= 10000:
+    
+    if abs(l) <= local_seq_size:
         ### breakpoint withOUT deletion
         header = ">ref_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][s - 5001 : e + 5000]
+        seq = genome[ch][s - side_length : e + side_length]
         out1.write(header + seq + "\n")
 
     else:
         # left breakpoint withOUT deletion
         header = ">refLeft_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][s - 5001 : s + 5000]
+        seq = genome[ch][s - side_length : s + side_length]
         out1.write(header + seq + "\n")
 
         # right breakpoint withOUT deletion
         header = ">refRight_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][e - 5001 : e + 5000]
+        seq = genome[ch][e - side_length : e + side_length]
         out1.write(header + seq + "\n")
 
     ### breakpoint WITH the deletion
     header_seq = ">del_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-    seq_del = genome[ch][s - 5001 : s]
-    seq_del += genome[ch][e : e + 5000]
+    seq_del = genome[ch][s - side_length : s]
+    seq_del += genome[ch][e : e + side_length]
     out1.write(header_seq + seq_del + "\n")
 
 
 def define_references_for_insertions(out1, genome, insertion):
     """ Define the reference duplet """
+    local_seq_size = 10000 #size of the generated allelic sequence
+    side_length = local_seq_size / 2 
     ch, s, l, sequence = insertion
     
     #Ref
     header_seq = ">ref_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-    seq_ins = genome[ch][s - 5000 : s]
-    seq_ins += genome[ch][s : s + 5000]
+    seq_ins = genome[ch][s - side_length : s]
+    seq_ins += genome[ch][s : s + side_length]
     out1.write(header_seq + seq_ins + "\n")
     
        
-    if abs(l) <= 10000:
+    if abs(l) <= local_seq_size:
         ### breakpoint with insertion
         header = ">ins_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][s - 5000 : s]
+        seq = genome[ch][s - side_length : s]
         seq += sequence
-        seq += genome[ch][s:s + 5000]
+        seq += genome[ch][s:s + side_length]
         out1.write(header + seq + "\n")
 
     else:
         # left breakpoint with insertion
         header = ">insLeft_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][s - 5000 : s]
-        seq += sequence[:5000]
+        seq = genome[ch][s - side_length : s]
+        seq += sequence[:side_length]
         out1.write(header + seq + "\n")
 
         # right breakpoint with insertion
         header = ">insRight_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = sequence[-5000:]
-        seq += genome[ch][s: s + 5000]
+        seq = sequence[-side_length:]
+        seq += genome[ch][s: s + side_length]
         out1.write(header + seq + "\n")
 
 
