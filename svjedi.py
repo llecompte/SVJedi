@@ -3,6 +3,7 @@
 """*******************************************************************************
     Name: SVjedi 
     Description: SVjedi aims to genotype structural variant with long reads data.
+    Version: 1.0.0
     Author: Lolita Lecompte
     Contact: lolita.lecompte@inria.fr, IRISA/Univ Rennes/GenScale, Campus de Beaulieu, 35042 Rennes Cedex, France
 
@@ -22,6 +23,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 *******************************************************************************"""
+__version__ = '1.0.0'
 
 import os.path
 from os import path
@@ -35,6 +37,7 @@ from modules import genotype
 
 def parse_arguments(args):
     parser = argparse.ArgumentParser(description="Structural variations genotyping using long reads")
+    parser.add_argument("--version", action="version", version=__version__)
     parser.add_argument("-v", "--vcf", metavar="<vcffile>", help="vcf format", required=True)
 
     parser.add_argument("-r", "--ref", metavar="<refgenomefile>", nargs=1, help="fasta format")
@@ -59,7 +62,7 @@ def parse_arguments(args):
         metavar="<minNbAln>",
         type=int,
         default=3,
-        help="Minimum number of alignments to consider a deletion (default: 3>=)",
+        help="Minimum number of alignments to genotype a SV (default: 3>=)",
     )
 
     parser.add_argument(

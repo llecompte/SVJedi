@@ -52,7 +52,7 @@ def main(args):
         metavar="<minNbAln>",
         type=int,
         default=3,
-        help="Minimum number of alignments to consider a deletion (default: 3>=)",
+        help="Minimum number of alignments to genotype a SV (default: 3>=)",
     )
 
     args = parser.parse_args()
