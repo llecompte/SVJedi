@@ -163,7 +163,7 @@ def encode_genotype(g):
 
 def allele_normalization(nb_aln_per_allele, svtype, svlength):
 	''' Allele length normalization '''
-	if svlength > 10000: svlength = 10000 #max #todo use parameter
+	if svlength > 10000: svlength = 10000
 	
 	if svtype == "DEL":
 		nb_aln_longest_allele_seq = nb_aln_per_allele[0]
@@ -225,10 +225,8 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 					nbAln = [len(x) for x in dictReadAtJunction[in_sv]]
 					
 					unbalanced_sv = ("DEL", "INS")
-					print(nbAln)
 					if svtype in unbalanced_sv:
-						c1, c2 = allele_normalization(nbAln, svtype, in_length)     # normalization
-					print(c1, c2)
+						c1, c2 = allele_normalization(nbAln, svtype, in_length)  # normalization
 						   
 					prior_het = 1/3
 					rc1 = int(round(c1,0))
