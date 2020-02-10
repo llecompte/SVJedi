@@ -161,6 +161,20 @@ def encode_genotype(g):
     return genotype
 
 
+def allele_normalization(nb_aln_per_allele, svtype, svlength):
+	''' Allele length normalization '''
+	if svtype == "DEL":
+		nb_aln_longest_allele_seq = nb_aln_per_allele[0]
+		if nb_aln_longest_allele_seq > 0:
+			nb_aln_per_allele[0] = round(nb_aln_longest_allele_seq * 10000 / (10000 + svlength), 3)
+	
+	elif svtype == "INS":
+		nb_aln_longest_allele_seq = nb_aln_per_allele[1]
+		if nb_aln_longest_allele_seq > 0:
+			nb_aln_per_allele[1] = round(nb_aln_longest_allele_seq * 10000 / (10000 + svlength), 3)
+	
+	return nb_aln_per_allele
+
 
 def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
     """ Output in VCF format and take genotype decision """
@@ -207,20 +221,14 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
                                        
                 else:
                     nbAln = [len(x) for x in dictReadAtJunction[in_sv]]
-
-                    # normalization
-                    if svtype == "DEL":         
-                        nbAln_prev = nbAln[0]
-                        if nbAln[0] != 0:
-                            nbAln[0] = round(nbAln_prev * 10000 / (10000 + in_length), 3)
-                            
-                    elif svtype == "INS":
-                        nbAln_prev = nbAln[1]
-                        if nbAln[1] != 0:
-                            nbAln[1] = round(nbAln_prev * 10000 / (10000 + in_length), 3)
-                    
+					
+					unbalanced_sv = ("DEL", "INS")
+					print(nbAln)
+                    if svtype in unbalanced_sv:
+						c1, c2 = allele_normalization(nbAln, svtype, in_length)		# normalization
+					print(c1, c2)
+					       
                     prior_het = 1/3
-                    c1, c2 = nbAln
                     rc1 = int(round(c1,0))
                     rc2 = int(round(c2,0))
                     e = 0.00005
