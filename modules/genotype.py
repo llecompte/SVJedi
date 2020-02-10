@@ -163,6 +163,8 @@ def encode_genotype(g):
 
 def allele_normalization(nb_aln_per_allele, svtype, svlength):
 	''' Allele length normalization '''
+	if svlength > 10000: svlength = 10000 #max #todo use parameter
+	
 	if svtype == "DEL":
 		nb_aln_longest_allele_seq = nb_aln_per_allele[0]
 		if nb_aln_longest_allele_seq > 0:
