@@ -150,7 +150,7 @@ def define_references_for_deletions(out1, genome, deletion):
 def define_references_for_insertions(out1, genome, insertion):
     """ Define the reference duplet """
     local_seq_size = 10000 #size of the generated allelic sequence
-    side_length = local_seq_size / 2 
+    side_length = int(local_seq_size / 2)
     ch, s, l, sequence = insertion
     
     #Ref
