@@ -228,7 +228,6 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 					if svtype in unbalanced_sv:
 						c1, c2 = allele_normalization(nbAln, svtype, in_length)  # normalization
 						   
-					prior_het = 1/3
 					rc1 = int(round(c1,0))
 					rc2 = int(round(c2,0))
 					e = 0.00005
@@ -236,10 +235,6 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 					lik0 = Decimal(c1*math.log10(1-e)) + Decimal(c2*math.log10(e)) 
 					lik1 = Decimal((c1+c2)*math.log10(1/2)) 
 					lik2 = Decimal(c2*math.log10(1-e)) + Decimal(c1*math.log10(e))
-					
-					lik0 += Decimal(math.log10((1-prior_het)/2))
-					lik1 += Decimal(math.log10(prior_het))
-					lik2 += Decimal(math.log10((1-prior_het/2)))
 					
 					L = [lik0, lik1, lik2]
 					
