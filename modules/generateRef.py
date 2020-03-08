@@ -25,6 +25,7 @@
 
 import sys
 import argparse
+from Bio.Seq import Seq
 
 
 def main(args):
@@ -51,6 +52,7 @@ def create_ref(genome, set_of_sv):
 	dict_of_chrom = {}
 	list_of_deletions = []
 	list_of_insertions = []
+	list_of_inversions = []
 
 	# original sequence ref required
 	with open(genome) as sequenceFile:
@@ -123,8 +125,10 @@ def create_ref(genome, set_of_sv):
 	f1 = open(filename_normal, "w")
 	for d in list_of_deletions:
 		define_references_for_deletions(f1, dict_of_chrom, d)
-	for i in list_of_insertions:
-		define_references_for_insertions(f1, dict_of_chrom, i)
+	for ins in list_of_insertions:
+		define_references_for_insertions(f1, dict_of_chrom, ins)
+	for inv in lis_of_inversions:
+		define_references_for_inversions(f1, dict_of_chrom, inv)
 	f1.close()
 
 
