@@ -237,6 +237,8 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 					unbalanced_sv = ("DEL", "INS")
 					if svtype in unbalanced_sv:
 						c1, c2 = allele_normalization(nbAln, svtype, in_length)  # normalization
+					else:
+						c1, c2 = nbAln
 						   
 					rc1 = int(round(c1,0))
 					rc2 = int(round(c2,0))
