@@ -127,7 +127,7 @@ def create_ref(genome, set_of_sv):
 		define_references_for_deletions(f1, dict_of_chrom, d)
 	for ins in list_of_insertions:
 		define_references_for_insertions(f1, dict_of_chrom, ins)
-	for inv in lis_of_inversions:
+	for inv in list_of_inversions:
 		define_references_for_inversions(f1, dict_of_chrom, inv)
 	f1.close()
 
