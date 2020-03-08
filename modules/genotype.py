@@ -198,20 +198,30 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 
 
 				svtype = in_info.split('SVTYPE=')[1].split(';')[0]
-				if svtype == 'DEL': #retrive svlength for deletion
+				svtype = in_info.split('SVTYPE=')[1].split(';')[0]
+				
+				if svtype == 'DEL': #retrive svlength for deletions
 					if "SVLEN=FALSE" in in_info:
 						if in_info.startswith("END="):
 							end = in_info.split("END=")[1].split(";")[0]
 						else:
 							end = in_info.split(";END=")[1].split(";")[0]
 
-						in_length = abs(int(end) - int(start))
+						in_length = int(end) - int(in_start)
 
 					elif "SVLEN=" in in_info:
 						in_length = abs(int(in_info.split("SVLEN=")[1].split(";")[0]))
 				
 				elif svtype == 'INS': #retrive svlength for insertion
 					in_length = len(in_type)
+				
+				elif svtype == 'INV':
+					if in_info.startswith("END="):
+						end = in_info.split("END=")[1].split(';')[0]
+					else:
+						end = in_info.split(";END=")[1].split(';')[0]
+					
+					in_length = int(end) - int(in_start)
 					
 				if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
 
