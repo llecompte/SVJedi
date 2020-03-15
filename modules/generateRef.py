@@ -95,7 +95,10 @@ def create_ref(genome, set_of_sv):
 				if type_sv == "<DEL>" or svtype == 'DEL':
 				
 					start = int(start)
-					length = abs(int(info.split("SVLEN=")[1].split(";")[0]))
+					if info.split(';')[-1].startswith('SVLEN='):
+						length = abs(int(info.split("SVLEN=")[1]))
+					else:
+						length = abs(int(info.split("SVLEN=")[1].split(";")[0]))
 					end = start + length
 
 					# focus on >=50bp length deletion

@@ -212,7 +212,10 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 						in_length = int(end) - int(in_start)
 
 					elif "SVLEN=" in in_info:
-						in_length = abs(int(in_info.split("SVLEN=")[1].split(";")[0]))
+						if in_info.split(';')[-1].startswith('SVLEN='):
+							in_length = abs(int(in_info.split("SVLEN=")[1]))
+						else:
+							in_length = abs(int(in_info.split("SVLEN=")[1].split(";")[0]))
 				
 				elif svtype == 'INS': #retrive svlength for insertion
 					in_length = len(in_type)
