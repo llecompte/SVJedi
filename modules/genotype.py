@@ -196,8 +196,6 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 			else:
 				in_chrom, in_start, _, __, in_type, ___, ____, in_info, *_ = line.rstrip("\n").split("\t")
 
-
-				svtype = in_info.split('SVTYPE=')[1].split(';')[0]
 				svtype = in_info.split('SVTYPE=')[1].split(';')[0]
 				
 				if svtype == 'DEL': #retrive svlength for deletions
@@ -223,9 +221,17 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 					
 					in_length = int(end) - int(in_start)
 					
+										
 				if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
-
-				in_sv = in_chrom + "_" + in_start + "-" + str(in_length)
+				
+				if svtype == 'BND': 
+					end = in_info.split("END=")[1].split(";")[0]
+					chr2 = in_info.split("CHR2=")[1].split(";")[0]
+					in_sv = in_chom + "_" + in_start + "-" + chr2 + "-" + end
+				
+				else: 
+					in_sv = in_chrom + "_" + in_start + "-" + str(in_length)
+				
 				if in_sv not in list(dictReadAtJunction.keys()):
 					nbAln = [0,0]
 					geno = "./."

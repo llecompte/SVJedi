@@ -53,6 +53,7 @@ def create_ref(genome, set_of_sv):
 	list_of_deletions = []
 	list_of_insertions = []
 	list_of_inversions = []
+	list_of_translocations = []
 
 	# original sequence ref required
 	with open(genome) as sequenceFile:
@@ -108,17 +109,24 @@ def create_ref(genome, set_of_sv):
 						list_of_insertions.append((chrom, start, length, type_sv))
 
 				#for inversions
-				elif type_sv == "<INV>" or info.split("SVTYPE=")[1].split(";")[0] == "INV":
+				elif type_sv == '<INV>' or info.split('SVTYPE=')[1].split(';')[0] == 'INV':
 					start = int(start)
-					end = int(info.split(";END=")[1].split(";")[0])
+					end = int(info.split(';END=')[1].split(';')[0])
 					length = end - start
 					 
-					# focus on >=50bp length deletion
+					# focus on >=50bp length inversions
 					if length >= 50:
 						list_of_inversions.append((chrom, start, end, length))
 
+				#for translocations
+				elif info.split('SVTYPE')[1].split(';')[0] = 'BND':
+					start = int(start)
+					chrom2 = info.split('CHR2=')[1].split(';')[0]
+					end = int(info.split(';END=')[1].split(';')[0])
 
-
+					list_of_translocation.append((chrom, start, chrom2, end))
+						
+						
 	# output files
 	filename_normal = "reference_at_breakpoints.fasta"
 
@@ -129,6 +137,8 @@ def create_ref(genome, set_of_sv):
 		define_references_for_insertions(f1, dict_of_chrom, ins)
 	for inv in list_of_inversions:
 		define_references_for_inversions(f1, dict_of_chrom, inv)
+	for trans in list_of_translocations:
+		define_references_for_translocation(f1, dict_of_chrom, trans)
 	f1.close()
 
 
@@ -238,7 +248,24 @@ def define_references_for_inversions(out1, genome, inversion):
 		seq += str(inversion.reverse_complement()) #add rev comp seq        
 		seq += genome[ch][e : e + side_length] #add right side
 		out1.write(header + seq + "\n")
-		
+
+def define_references_for_translocation(out1, genome, translocation):
+	''' '''
+	local_seq_size = 10000 #size of the generated allelic sequence
+	side_length = int(local_seq_size / 2)
+	ch, s, chr2, e = translocation
+
+	#ref
+	header = ">ref_" + str(ch) + "_" + str(s) + "-" + chr2 + "-" + str(e) + "\n"
+	seq = genome[ch][s - side_length : e + side_length]
+	out1.write(header + seq + "\n")
+	
+	#alt
+	header = ">bnd_" + str(ch) + "_" + str(s) + "-" + chr2 + "-" + str(e) + "\n" 
+	seq = genome[ch][s - side_length : s] #add inv left side
+	seq += genome[ch2][e : e + side_length] #add right side
+	out1.write(header + seq + "\n")
+	
 		
 if __name__ == "__main__":
 	if sys.argv == 1:
