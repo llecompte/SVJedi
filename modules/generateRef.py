@@ -119,7 +119,7 @@ def create_ref(genome, set_of_sv):
 						list_of_inversions.append((chrom, start, end, length))
 
 				#for translocations
-				elif info.split('SVTYPE')[1].split(';')[0] = 'BND':
+				elif info.split('SVTYPE')[1].split(';')[0] == 'BND':
 					start = int(start)
 					chrom2 = info.split('CHR2=')[1].split(';')[0]
 					end = int(info.split(';END=')[1].split(';')[0])
