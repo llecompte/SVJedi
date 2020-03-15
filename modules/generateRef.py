@@ -85,10 +85,14 @@ def create_ref(genome, set_of_sv):
 					chrom, start, _, __, type_sv, ___, ____, info = line.rstrip(
 						"\n"
 					).split("\t")
-					
+				
+				if info.split(';')[-1].startswith('SVTYPE='):
+					svtype = info.split('SVTYPE=')[1]
+				else:
+					svtype = info.split('SVTYPE=')[1].split(';')[0]
 								
 				#for deletions
-				if type_sv == "<DEL>" or info.split('SVTYPE=')[1].split(';')[0] == 'DEL':
+				if type_sv == "<DEL>" or svtype == 'DEL':
 				
 					start = int(start)
 					length = abs(int(info.split("SVLEN=")[1].split(";")[0]))
@@ -100,7 +104,7 @@ def create_ref(genome, set_of_sv):
 				
 						   
 				#for insertion
-				elif info.split('SVTYPE=')[1].split(';')[0] == 'INS':
+				elif svtype == 'INS':
 					start = int(start)
 					length = len(type_sv)
 								
@@ -109,7 +113,7 @@ def create_ref(genome, set_of_sv):
 						list_of_insertions.append((chrom, start, length, type_sv))
 
 				#for inversions
-				elif type_sv == '<INV>' or info.split('SVTYPE=')[1].split(';')[0] == 'INV':
+				elif type_sv == '<INV>' or svtype == 'INV':
 					start = int(start)
 					end = int(info.split(';END=')[1].split(';')[0])
 					length = end - start
@@ -119,7 +123,7 @@ def create_ref(genome, set_of_sv):
 						list_of_inversions.append((chrom, start, end, length))
 
 				#for translocations
-				elif info.split('SVTYPE')[1].split(';')[0] == 'BND':
+				elif svtype == 'BND':
 					start = int(start)
 					chrom2 = info.split('CHR2=')[1].split(';')[0]
 					end = int(info.split(';END=')[1].split(';')[0])

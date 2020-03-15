@@ -196,8 +196,12 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 			else:
 				in_chrom, in_start, _, __, in_type, ___, ____, in_info, *_ = line.rstrip("\n").split("\t")
 
-				svtype = in_info.split('SVTYPE=')[1].split(';')[0]
-				
+				if info.split(';')[-1].startswith('SVTYPE='):
+					svtype = info.split('SVTYPE=')[1]
+				else:
+					svtype = info.split('SVTYPE=')[1].split(';')[0]
+					
+									
 				if svtype == 'DEL': #retrive svlength for deletions
 					if "SVLEN=FALSE" in in_info:
 						if in_info.startswith("END="):
