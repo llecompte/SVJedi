@@ -134,7 +134,7 @@ def create_ref(genome, set_of_sv):
 					chrom2 = info.split('CHR2=')[1].split(';')[0]
 					end = int(info.split(';END=')[1].split(';')[0])
 
-					list_of_translocation.append((chrom, start, chrom2, end))
+					list_of_translocations.append((chrom, start, chrom2, end))
 						
 						
 	# output files
