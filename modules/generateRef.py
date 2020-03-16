@@ -273,7 +273,7 @@ def define_references_for_translocation(out1, genome, translocation):
 	#alt
 	header = ">bnd_" + str(ch) + "_" + str(s) + "-" + chr2 + "-" + str(e) + "\n" 
 	seq = genome[ch][s - side_length : s] #add inv left side
-	seq += genome[ch2][e : e + side_length] #add right side
+	seq += genome[chr2][e : e + side_length] #add right side
 	out1.write(header + seq + "\n")
 	
 		
