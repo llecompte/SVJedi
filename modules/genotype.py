@@ -226,10 +226,8 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 					if in_info.startswith("END="):
 						end = in_info.split("END=")[1].split(';')[0]
 					else:
-						end = in_info.split(";END=")[1].split(';')[0]
-					
+						end = in_info.split(";END=")[1].split(';')[0]				
 					in_length = int(end) - int(in_start)
-					
 
 				
 				if svtype == 'BND': 
@@ -237,7 +235,10 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 					chr2 = in_info.split("CHR2=")[1].split(";")[0]
 					in_sv = in_chom + "_" + in_start + "-" + chr2 + "-" + end
 				
-				else: 
+				elif svtype == '':
+					continue
+				
+				else:					
 					if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
 					in_sv = in_chrom + "_" + in_start + "-" + str(in_length)
 				
