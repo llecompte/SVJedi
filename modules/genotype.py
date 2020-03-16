@@ -233,7 +233,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 				if svtype == 'BND': 
 					end = in_info.split("END=")[1].split(";")[0]
 					chr2 = in_info.split("CHR2=")[1].split(";")[0]
-					in_sv = in_chom + "_" + in_start + "-" + chr2 + "-" + end
+					in_sv = in_chrom + "_" + in_start + "-" + chr2 + "-" + end
 				
 				elif svtype == '':
 					continue
