@@ -126,23 +126,23 @@ def define_references_for_deletions(out1, genome, deletion):
     if abs(l) <= local_seq_size:
         ### breakpoint withOUT deletion
         header = ">ref_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][s - side_length : e + side_length]
+        seq = genome[ch][s - (side_length + 1): e + side_length]
         out1.write(header + seq + "\n")
 
     else:
         # left breakpoint withOUT deletion
         header = ">refLeft_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][s - side_length : s + side_length]
+        seq = genome[ch][s - (side_length + 1): s + side_length]
         out1.write(header + seq + "\n")
 
         # right breakpoint withOUT deletion
         header = ">refRight_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][e - side_length : e + side_length]
+        seq = genome[ch][e - (side_length +1) : e + side_length]
         out1.write(header + seq + "\n")
 
     ### breakpoint WITH the deletion
     header_seq = ">del_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-    seq_del = genome[ch][s - side_length : s]
+    seq_del = genome[ch][s - (side_length + 1) : s]
     seq_del += genome[ch][e : e + side_length]
     out1.write(header_seq + seq_del + "\n")
 
