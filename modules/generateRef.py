@@ -87,10 +87,8 @@ def create_ref(genome, set_of_sv):
 					).split("\t")
 				
 				if 'SVTYPE' in info:
-					if info.split(';')[-1].startswith('SVTYPE='):
-						svtype = info.split('SVTYPE=')[1]
-					else:
-						svtype = info.split('SVTYPE=')[1].split(';')[0]
+					svtype = info.split('SVTYPE=')[1].split(';')[0]
+
 				else:
 					svtype = '' 
 				
