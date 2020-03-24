@@ -254,7 +254,7 @@ def define_references_for_inversions(out1, genome, inversion):
 	   
 		header = ">invRight_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n" 
 		inversion = Seq(genome[ch][e - side_length : e])
-		seq += str(inversion.reverse_complement()) #add rev comp seq        
+		seq = str(inversion.reverse_complement()) #add rev comp seq        
 		seq += genome[ch][e : e + side_length] #add right side
 		out1.write(header + seq + "\n")
 
