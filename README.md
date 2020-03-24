@@ -7,7 +7,7 @@ Based on a representation of the different alleles, it estimates the genotype of
 SVJedi takes as input a *variant file* (VCF), a *reference genome* (fasta) and a *long read file* (fasta/fastq) and 
 outputs the initial variant file with an additional column containing genotyping information (VCF).
 
-For the moment, SVJedi processes **deletions** and **insertions**.
+SVJedi processes **deletions**, **insertions**, **inversions** and **translocations**.
 
 SVJedi is organized in three main steps:
 
@@ -22,7 +22,8 @@ SVJedi is organized in three main steps:
 
 - Python3
 - Minimap2
-- numpy
+- NumPy
+- Biopython
 
 
 ### Usage
@@ -30,7 +31,7 @@ SVJedi is organized in three main steps:
     python3 svjedi.py -v <set_of_sv.vcf> -r <refgenome.fasta> -i <long_reads.fastq>
 
 Note: Chromosome names in `reference.fasta` and in `set_of_sv.vcf` must be the same. 
-Also, the `SVTYPE` tag must be present in the VCF (`SVTYPE=DEL` or as `SVTYPE=INS`).
+Also, the `SVTYPE` tag must be present in the VCF (`SVTYPE=DEL` or as `SVTYPE=INS` or as `SVTYPE=INV` or as `SVTYPE=BND`).
 
 
 ### Installation
