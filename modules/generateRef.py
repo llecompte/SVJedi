@@ -241,7 +241,7 @@ def define_references_for_inversions(out1, genome, inversion):
 		seq = genome[ch][s - side_length : s + side_length]
 		out1.write(header + seq + "\n")
 		
-		header = ">refLeft_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
+		header = ">refRight_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
 		seq = genome[ch][e - side_length : e + side_length]
 		out1.write(header + seq + "\n")
    
