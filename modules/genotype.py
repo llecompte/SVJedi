@@ -196,12 +196,17 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 			else:
 				in_chrom, in_start, _, __, in_type, ___, ____, in_info, *_ = line.rstrip("\n").split("\t")
 
+				### get SVTYPE ###
 				if 'SVTYPE' in in_info:
-					svtype = in_info.split('SVTYPE=')[1].split(';')[0]
+					if in_info.split(';')[-1].startswith('SVTYPE='):
+						svtype = in_info.split('SVTYPE=')[1]
+					else:
+						svtype = in_info.split('SVTYPE=')[1].split(';')[0]
 				else:
 					svtype = ''
-									
-				if svtype == 'DEL': #retrive svlength for deletions
+				
+				### get LENGTH for DELETION ###					
+				if svtype == 'DEL':
 					if "SVLEN=FALSE" in in_info:
 						if in_info.startswith("END="):
 							end = in_info.split("END=")[1].split(";")[0]
@@ -217,10 +222,12 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 							in_length = abs(int(in_info.split("SVLEN=")[1].split(";")[0]))
 				
 				
-				elif svtype == 'INS': #retrive svlength for insertion
+				### get LENGTH for INSERTION ###					
+				elif svtype == 'INS': 
 					in_length = len(in_type)
 				
 				
+				### get LENGTH for INVERSION ###				
 				elif svtype == 'INV':
 					if in_info.startswith("END="):
 						end = in_info.split("END=")[1].split(';')[0]
@@ -228,22 +235,27 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 						end = in_info.split(";END=")[1].split(';')[0]				
 					in_length = int(end) - int(in_start)
 
-				
-				if svtype == 'BND': 
+
+				### get sv id for TRANSLOCATION ###				
+				elif svtype == 'BND': 
 					if in_info.startswith("END="):
 						end = in_info.split("END=")[1].split(';')[0]
 					else:
 						end = in_info.split(";END=")[1].split(';')[0]	
 	
 					chr2 = in_info.split("CHR2=")[1].split(";")[0]
-					in_sv = in_chrom + "_" + in_start + "-" + chr2 + "-" + end
-					
+					in_sv = in_chrom + "_" + in_start + "-" + chr2 + "-" + end #define sv id for TRANS
+				
+				
 				elif svtype == '':
 					continue
 				
-				else:					
+				
+				
+				if svtype in ('DEL', 'INS', 'INV'):			
 					if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
-					in_sv = in_chrom + "_" + in_start + "-" + str(in_length)
+					in_sv = in_chrom + "_" + in_start + "-" + str(in_length) #define sv id for DEL, INS, INV
+				
 				
 				if in_sv not in list(dictReadAtJunction.keys()):
 					nbAln = [0,0]
