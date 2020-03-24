@@ -132,8 +132,9 @@ def create_ref(genome, set_of_sv):
 					chrom2 = info.split('CHR2=')[1].split(';')[0]
 					if chrom2 not in list(dict_of_chrom.keys()): continue
 					else: 
+						trans_case = translocation_cases(type_sv) #determine the translocation case
 						end = int(info.split(';END=')[1].split(';')[0])
-						list_of_translocations.append((chrom, start, chrom2, end))
+						list_of_translocations.append((chrom, start, chrom2, end, trans_case))
 						
 						
 	# output files
@@ -263,7 +264,7 @@ def define_references_for_translocation(out1, genome, translocation):
 	''' '''
 	local_seq_size = 10000 #size of the generated allelic sequence
 	side_length = int(local_seq_size / 2)
-	ch, s, chr2, e = translocation
+	ch, s, chr2, e, case = translocation
 
 	#ref
 	header = ">ref_" + str(ch) + "_" + str(s) + "-" + chr2 + "-" + str(e) + "\n"
@@ -272,11 +273,52 @@ def define_references_for_translocation(out1, genome, translocation):
 	
 	#alt
 	header = ">bnd_" + str(ch) + "_" + str(s) + "-" + chr2 + "-" + str(e) + "\n" 
-	seq = genome[ch][s - side_length : s] #add inv left side
-	seq += genome[chr2][e : e + side_length] #add right side
-	out1.write(header + seq + "\n")
+	seq = ''
+	if case == 'after_piece':
+		seq = genome[ch][s - side_length : s] #add inv left side
+		seq += genome[chr2][e : e + side_length] #add right side
 	
+	elif case == 'after_revcomp':
+		seq = genome[ch][s - side_length : s] #add inv left side
+		seq += str(Seq(genome[chr2][e - side_length : e]).reverse_complement()) #add right side
 		
+	elif case == 'before_piece':
+		seq = genome[chr2][e - side_length : e] #add right side
+		seq += genome[ch][s : s + side_length]
+		
+	elif case == 'before_revcomp':
+		seq = str(Seq(genome[chr2][e : e + side_length]).reverse_complement()) #add right side
+		seq += genome[ch][s : s + side_length]
+		
+	out1.write(header + seq + "\n")
+
+
+
+def translocation_cases(alt):
+	''' Determine the translocation cases '''
+	if alt.endswith('['):
+		#t[p[
+		#piece extending to the right of p is joined after t
+		case = 'after_piece'
+		
+	elif type_sv.endswith(']'):
+		#t]p]	
+		#reverse comp piece extending left of p is joined after t	
+		case = 'after_revcomp'
+			
+	elif type_sv.startswith(']'):
+		#]p]t
+		#piece extending to the left of p is joined before t 
+		case = 'before_piece'
+		
+	elif type_sv.startswith('['):
+		#[p[t[
+		#reverse comp piece extending right of p is joined before t 
+		case = 'before_revcomp'
+		
+	return case
+
+
 if __name__ == "__main__":
 	if sys.argv == 1:
 		sys.exit("Error: missing arguments")
