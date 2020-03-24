@@ -197,10 +197,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 				in_chrom, in_start, _, __, in_type, ___, ____, in_info, *_ = line.rstrip("\n").split("\t")
 
 				if 'SVTYPE' in in_info:
-					if in_info.split(';')[-1].startswith('SVTYPE='):
-						svtype = in_info.split('SVTYPE=')[1]
-					else:
-						svtype = in_info.split('SVTYPE=')[1].split(';')[0]
+					svtype = in_info.split('SVTYPE=')[1].split(';')[0]
 				else:
 					svtype = ''
 									

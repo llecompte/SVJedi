@@ -258,6 +258,7 @@ def define_references_for_inversions(out1, genome, inversion):
 		seq += genome[ch][e : e + side_length] #add right side
 		out1.write(header + seq + "\n")
 
+
 def define_references_for_translocation(out1, genome, translocation):
 	''' '''
 	local_seq_size = 10000 #size of the generated allelic sequence
