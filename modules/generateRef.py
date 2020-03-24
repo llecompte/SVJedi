@@ -248,12 +248,12 @@ def define_references_for_inversions(out1, genome, inversion):
 		#alt
 		header = ">invLeft_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n" 
 		seq = genome[ch][s - side_length : s] #add inv left side
-		inversion = Seq(genome[ch][s : s + side_length])
+		inversion = Seq(genome[ch][e : e + side_length])
 		seq += str(inversion.reverse_complement()) #add rev comp seq
 		out1.write(header + seq + "\n")
 	   
 		header = ">invRight_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n" 
-		inversion = Seq(genome[ch][e - side_length : e])
+		inversion = Seq(genome[ch][s - side_length : s])
 		seq = str(inversion.reverse_complement()) #add rev comp seq        
 		seq += genome[ch][e : e + side_length] #add right side
 		out1.write(header + seq + "\n")
