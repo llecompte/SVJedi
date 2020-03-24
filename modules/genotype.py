@@ -216,8 +216,10 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 						else:
 							in_length = abs(int(in_info.split("SVLEN=")[1].split(";")[0]))
 				
+				
 				elif svtype == 'INS': #retrive svlength for insertion
 					in_length = len(in_type)
+				
 				
 				elif svtype == 'INV':
 					if in_info.startswith("END="):
@@ -228,10 +230,14 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 
 				
 				if svtype == 'BND': 
-					end = in_info.split("END=")[1].split(";")[0]
+					if in_info.startswith("END="):
+						end = in_info.split("END=")[1].split(';')[0]
+					else:
+						end = in_info.split(";END=")[1].split(';')[0]	
+	
 					chr2 = in_info.split("CHR2=")[1].split(";")[0]
 					in_sv = in_chrom + "_" + in_start + "-" + chr2 + "-" + end
-				
+					
 				elif svtype == '':
 					continue
 				
@@ -264,11 +270,13 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 					L = [lik0, lik1, lik2]
 					
 					index_of_L_max = [i for i, x in enumerate(L) if x == max(L)]
-					if len(index_of_L_max) == 1: geno_not_encoded = str(index_of_L_max[0])
-					else:print('Multiple index with same value', L)
-					
-					geno = encode_genotype(geno_not_encoded)
-					
+					if len(index_of_L_max) == 1: 
+						geno_not_encoded = str(index_of_L_max[0])
+						geno = encode_genotype(geno_not_encoded)
+					else:
+						#print('Multiple index with same value', L)
+						geno = "./." 	#no genotype estimation since likelihood are not conclusive
+										
 					combination = Decimal(math.factorial(rc1 + rc2)) / Decimal(math.factorial(rc1)) / Decimal(math.factorial(rc2))
 					lik0 += combination 
 					lik1 += combination
