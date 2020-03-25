@@ -31,7 +31,8 @@ SVJedi is organized in three main steps:
     python3 svjedi.py -v <set_of_sv.vcf> -r <refgenome.fasta> -i <long_reads.fastq>
 
 Note: Chromosome names in `reference.fasta` and in `set_of_sv.vcf` must be the same. 
-Also, the `SVTYPE` tag must be present in the VCF (`SVTYPE=DEL` or as `SVTYPE=INS` or as `SVTYPE=INV` or as `SVTYPE=BND`).
+Also, the `SVTYPE` tag must be present in the VCF (`SVTYPE=DEL` or as `SVTYPE=INS` or as `SVTYPE=INV` or as `SVTYPE=BND`). 
+More details are given in [SV representation in VCF](#SV-representation-in-VCF).
 
 
 ### Installation
@@ -82,6 +83,26 @@ SVJedi two different usages from non aligned reads or from aligned reads (PAF fo
 | -t/--threads | Number of threads for mapping             |
 | -h/--help    | Show help                                 |
 
+### SV representation in VCF
+
+Some information needed for SVJedi to genotype the following variants. All variants must have the ```CHROM``` and ```POS``` fields defined. Then additional information is required according to SV type:
+
+- Deletion
+	- Either ```ALT``` field is ```<DEL>``` or ```INFO``` field must contain ```SVTYPE=DEL```
+	- ```INFO``` field must contain either ```END=``` or ```SVLEN=``` tag
+
+- Insertion
+	- ```INFO``` field must contain ```SVTYPE=INS```
+	- ```ALT``` field must contain the sequence of the insertion 
+	
+- Inversion
+	- Either ```ALT``` field is ```<INV>``` or ```INFO``` field must contain ```SVTYPE=INV```
+	- ```INFO``` field must contain ```END=``` tag
+
+- Translocation
+	- ```INFO``` field must contain ```SVTYPE=BND``` and ```CHR2=``` and ```END=``` tags
+	- CHR2 name and sequence must be in reference genome
+	- ```ALT``` field ALT must be formated as VCF Specification: ```t[chr:pos[```, ```t]chr:pos]```, ```]chr:pos]t``` or ```[chr:pos[t```
 
 ### Contact
 
