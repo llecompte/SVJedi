@@ -4,6 +4,7 @@
     Name: SVjedi 
     Description: SVjedi aims to genotype structural variant with long reads data.
     Version: 1.1.0
+
     Author: Lolita Lecompte
     Contact: lolita.lecompte@inria.fr, IRISA/Univ Rennes/GenScale, Campus de Beaulieu, 35042 Rennes Cedex, France
 

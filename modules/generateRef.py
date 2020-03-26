@@ -181,7 +181,6 @@ def define_references_for_deletions(out1, genome, deletion):
 	seq_del += genome[ch][e : e + side_length]
 	out1.write(header_seq + seq_del + "\n")
 
-
 def define_references_for_insertions(out1, genome, insertion):
 	""" Define the reference duplet """
 	local_seq_size = 10000 #size of the generated allelic sequence
