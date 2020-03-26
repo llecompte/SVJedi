@@ -11,8 +11,8 @@ SVJedi processes **deletions**, **insertions**, **inversions** and **translocati
 
 SVJedi is organized in three main steps:
 
-1. Generate allele reference sequences of a set of SVs given in a vcf file
-2. Map reads on previously generated references using Minimap2
+1. Generate representative allele sequences of a set of SVs given in a vcf file
+2. Map reads on previously generated allele sequences using Minimap2
 3. Genotype SVs and output a vcf file
 
 *Jedi comes from the verb jediñ* ['ʒeːdɪ] *in Breton, it means calculate.*
@@ -31,7 +31,7 @@ SVJedi is organized in three main steps:
     python3 svjedi.py -v <set_of_sv.vcf> -r <refgenome.fasta> -i <long_reads.fastq>
 
 Note: Chromosome names in `reference.fasta` and in `set_of_sv.vcf` must be the same. 
-Also, the `SVTYPE` tag must be present in the VCF (`SVTYPE=DEL` or as `SVTYPE=INS` or as `SVTYPE=INV` or as `SVTYPE=BND`). 
+Also, the `SVTYPE` tag must be present in the VCF (`SVTYPE=DEL` or `SVTYPE=INS` or `SVTYPE=INV` or `SVTYPE=BND`). 
 More details are given in [SV representation in VCF](#SV-representation-in-VCF).
 
 
@@ -39,7 +39,7 @@ More details are given in [SV representation in VCF](#SV-representation-in-VCF).
 
     git clone https://github.com/llecompte/SVJedi.git
 
-### Example
+### Examples
 
 The folder Data/HG002_son includes an example of 20 SVs (10 insertions and 10 deletions) to genotype on a subsample of a real human dataset of the Ashkenazim son HG002.
 
@@ -48,7 +48,7 @@ Example command line:
 	python3 svjedi.py -v Data/HG002_son/HG002_20SVs_Tier1_v0.6_PASS.vcf -a Data/HG002_son/reference_at_breakpoints.fasta -i Data/HG002_son/PacBio_reads_set.fastq.gz -o Data/HG002_son/genotype_results.vcf
 
 
-The folder Data/C_elegans includes an example on 5 deletions to genotype with a small synthetic read dataset on *Caenorhabditis elegans*.
+The folder Data/C_elegans includes an example on 12 SVs (del, ins, inv, bnd) to genotype with a small synthetic read dataset on a subset of the *Caenorhabditis elegans* genome.
 
 Example command line:
 
@@ -85,11 +85,11 @@ SVJedi two different usages from non aligned reads or from aligned reads (PAF fo
 
 ### SV representation in VCF
 
-Some information needed for SVJedi to genotype the following variants. All variants must have the ```CHROM``` and ```POS``` fields defined. Then additional information is required according to SV type:
+Here are the information needed for SVJedi to genotype the following SV types. All variants must have the ```CHROM``` and ```POS``` fields defined, with the chromosome names in `reference.fasta` and in `set_of_sv.vcf` that must be the same. Then additional information is required according to SV type:
 
 - Deletion
 	- Either ```ALT``` field is ```<DEL>``` or ```INFO``` field must contain ```SVTYPE=DEL```
-	- ```INFO``` field must contain either ```END=``` or ```SVLEN=``` tag
+	- ```INFO``` field must contain either ```END=pos``` (with `pos` being the end position of the deleted segment) or ```SVLEN=len``` (with `len` being the size of the deletion) tags
 
 - Insertion
 	- ```INFO``` field must contain ```SVTYPE=INS```
@@ -97,12 +97,12 @@ Some information needed for SVJedi to genotype the following variants. All varia
 	
 - Inversion
 	- Either ```ALT``` field is ```<INV>``` or ```INFO``` field must contain ```SVTYPE=INV```
-	- ```INFO``` field must contain ```END=``` tag
+	- ```INFO``` field must contain ```END=pos``` tag, with `pos` being the second breakpoint position
 
 - Translocation
 	- ```INFO``` field must contain ```SVTYPE=BND``` and ```CHR2=``` and ```END=``` tags
-	- CHR2 name and sequence must be in reference genome
-	- ```ALT``` field ALT must be formated as VCF Specification: ```t[chr:pos[```, ```t]chr:pos]```, ```]chr:pos]t``` or ```[chr:pos[t```
+	- CHR2 name and sequence must be in the reference genome fasta file
+	- ```ALT``` field must be formated as: ```t[chr:pos[```, ```t]chr:pos]```, ```]chr:pos]t``` or ```[chr:pos[t```, with `chr`and `pos` indicating the second breakpoint position and brackets directions indicating which parts of the two chromosomes should be joined together 
 
 ### Contact
 
