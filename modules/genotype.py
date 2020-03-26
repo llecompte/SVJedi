@@ -196,26 +196,67 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 			else:
 				in_chrom, in_start, _, __, in_type, ___, ____, in_info, *_ = line.rstrip("\n").split("\t")
 
-
-				svtype = in_info.split('SVTYPE=')[1].split(';')[0]
-				if svtype == 'DEL': #retrive svlength for deletion
+				### get SVTYPE ###
+				if 'SVTYPE' in in_info:
+					if in_info.split(';')[-1].startswith('SVTYPE='):
+						svtype = in_info.split('SVTYPE=')[1]
+					else:
+						svtype = in_info.split('SVTYPE=')[1].split(';')[0]
+				else:
+					svtype = ''
+				
+				### get LENGTH for DELETION ###					
+				if svtype == 'DEL':
 					if "SVLEN=FALSE" in in_info:
 						if in_info.startswith("END="):
 							end = in_info.split("END=")[1].split(";")[0]
 						else:
 							end = in_info.split(";END=")[1].split(";")[0]
 
-						in_length = abs(int(end) - int(start))
+						in_length = int(end) - int(in_start)
 
 					elif "SVLEN=" in in_info:
-						in_length = abs(int(in_info.split("SVLEN=")[1].split(";")[0]))
+						if in_info.split(';')[-1].startswith('SVLEN='):
+							in_length = abs(int(in_info.split("SVLEN=")[1]))
+						else:
+							in_length = abs(int(in_info.split("SVLEN=")[1].split(";")[0]))
 				
-				elif svtype == 'INS': #retrive svlength for insertion
+				
+				### get LENGTH for INSERTION ###					
+				elif svtype == 'INS': 
 					in_length = len(in_type)
-					
-				if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
+				
+				
+				### get LENGTH for INVERSION ###				
+				elif svtype == 'INV':
+					if in_info.startswith("END="):
+						end = in_info.split("END=")[1].split(';')[0]
+					else:
+						end = in_info.split(";END=")[1].split(';')[0]				
+					in_length = int(end) - int(in_start)
 
-				in_sv = in_chrom + "_" + in_start + "-" + str(in_length)
+
+				### get sv id for TRANSLOCATION ###				
+				elif svtype == 'BND': 
+					if in_info.startswith("END="):
+						end = in_info.split("END=")[1].split(';')[0]
+					else:
+						end = in_info.split(";END=")[1].split(';')[0]	
+	
+					chr2 = in_info.split("CHR2=")[1].split(";")[0]
+					in_sv = in_chrom + "_" + in_start + "-" + chr2 + "-" + end #define sv id for TRANS
+				
+				
+				elif svtype == '':
+					continue
+				
+				
+				
+				if svtype in ('DEL', 'INS', 'INV'):			
+					if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
+					in_sv = in_chrom + "_" + in_start + "-" + str(in_length) #define sv id for DEL, INS, INV
+				
+				
 				if in_sv not in list(dictReadAtJunction.keys()):
 					nbAln = [0,0]
 					geno = "./."
@@ -227,6 +268,8 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 					unbalanced_sv = ("DEL", "INS")
 					if svtype in unbalanced_sv:
 						c1, c2 = allele_normalization(nbAln, svtype, in_length)  # normalization
+					else:
+						c1, c2 = nbAln
 						   
 					rc1 = int(round(c1,0))
 					rc2 = int(round(c2,0))
@@ -239,11 +282,13 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 					L = [lik0, lik1, lik2]
 					
 					index_of_L_max = [i for i, x in enumerate(L) if x == max(L)]
-					if len(index_of_L_max) == 1: geno_not_encoded = str(index_of_L_max[0])
-					else:print('Multiple index with same value', L)
-					
-					geno = encode_genotype(geno_not_encoded)
-					
+					if len(index_of_L_max) == 1: 
+						geno_not_encoded = str(index_of_L_max[0])
+						geno = encode_genotype(geno_not_encoded)
+					else:
+						#print('Multiple index with same value', L)
+						geno = "./." 	#no genotype estimation since likelihood are not conclusive
+										
 					combination = Decimal(math.factorial(rc1 + rc2)) / Decimal(math.factorial(rc1)) / Decimal(math.factorial(rc2))
 					lik0 += combination 
 					lik1 += combination

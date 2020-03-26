@@ -3,7 +3,8 @@
 """*******************************************************************************
     Name: SVjedi 
     Description: SVjedi aims to genotype structural variant with long reads data.
-    Version: 1.0.2
+    Version: 1.1.0
+
     Author: Lolita Lecompte
     Contact: lolita.lecompte@inria.fr, IRISA/Univ Rennes/GenScale, Campus de Beaulieu, 35042 Rennes Cedex, France
 
@@ -23,7 +24,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 *******************************************************************************"""
-__version__ = '1.0.2'
+__version__ = '1.1.0'
 
 import os.path
 from os import path
