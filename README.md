@@ -52,7 +52,7 @@ The folder Data/C_elegans includes an example on 12 SVs (del, ins, inv, bnd) to 
 
 Example command line:
 
-    python3 svjedi.py -v Data/C_elegans/5del_C_elegans.vcf -r Data/C_elegans/C_elegans.chr.I.fa -i Data/C_elegans/reads_C_elegans.fastq.gz -o Data/C_elegans/5del_C_elegans_with_genotypes.vcf
+    python3 svjedi.py -v Data/C_elegans/test.vcf -r Data/C_elegans/genome.fasta -i Data/C_elegans/simulated-reads.fastq.gz
 
 
 
