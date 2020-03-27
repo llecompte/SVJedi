@@ -39,6 +39,10 @@ More details are given in [SV representation in VCF](#SV-representation-in-VCF).
 
     git clone https://github.com/llecompte/SVJedi.git
 
+SVJedi is also distributed as a [Bioconda package](https://anaconda.org/bioconda/svjedi):
+
+	conda install -c bioconda svjedi	
+
 ### Examples
 
 The folder Data/HG002_son includes an example of 20 SVs (10 insertions and 10 deletions) to genotype on a subsample of a real human dataset of the Ashkenazim son HG002.
