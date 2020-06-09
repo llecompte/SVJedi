@@ -108,6 +108,11 @@ Here are the information needed for SVJedi to genotype the following SV types. A
 	- CHR2 name and sequence must be in the reference genome fasta file
 	- ```ALT``` field must be formated as: ```t[chr:pos[```, ```t]chr:pos]```, ```]chr:pos]t``` or ```[chr:pos[t```, with `chr`and `pos` indicating the second breakpoint position and brackets directions indicating which parts of the two chromosomes should be joined together 
 
+### Reference
+
+SVJedi: Genotyping structural variations with long reads. Lecompte L, Peterlongo P, Lavenier D, Lemaitre C. *Bioinformatics* 2020 [doi:10.1093/bioinformatics/btaa527](https://academic.oup.com/bioinformatics/advance-article-abstract/doi/10.1093/bioinformatics/btaa527/5841661) ([bioRxiv preprint](https://www.biorxiv.org/content/10.1101/849208v1))
+
+
 ### Contact
 
 SVJedi is a [Genscale](http://team.inria.fr/genscale/) tool developed by Lolita Lecompte <lolita.lecompte@inria.fr>
