@@ -40,14 +40,14 @@ def main(args):
 		"-r", "--ref", metavar="<reffile>", nargs=1, help="fasta format", required=True
 	)
 	args = parser.parse_args()
-
+	
 	genome_file = args.ref[0]
 	vcf_file = args.vcf[0]
+	Ladj = 5000
+	create_ref(genome_file, vcf_file, Ladj)
 
-	create_ref(genome_file, vcf_file)
 
-
-def create_ref(genome, set_of_sv):
+def create_ref(genome, set_of_sv, Ladj):
 	""" Generate triplet of reference """
 	dict_of_chrom = {}
 	list_of_deletions = []
@@ -142,20 +142,19 @@ def create_ref(genome, set_of_sv):
 
 	f1 = open(filename_normal, "w")
 	for d in list_of_deletions:
-		define_references_for_deletions(f1, dict_of_chrom, d)
+		define_references_for_deletions(f1, dict_of_chrom, d, Ladj)
 	for ins in list_of_insertions:
-		define_references_for_insertions(f1, dict_of_chrom, ins)
+		define_references_for_insertions(f1, dict_of_chrom, ins, Ladj)
 	for inv in list_of_inversions:
-		define_references_for_inversions(f1, dict_of_chrom, inv)
+		define_references_for_inversions(f1, dict_of_chrom, inv, Ladj)
 	for trans in list_of_translocations:
-		define_references_for_translocation(f1, dict_of_chrom, trans)
+		define_references_for_translocation(f1, dict_of_chrom, trans, Ladj)
 	f1.close()
 
 
-def define_references_for_deletions(out1, genome, deletion):
+def define_references_for_deletions(out1, genome, deletion, side_length):
 	""" Define the reference duplet """
-	local_seq_size = 10000 #size of the generated allelic sequence
-	side_length = int(local_seq_size / 2)
+	local_seq_size = 2 * side_length #size of the generated allelic sequence
 	ch, s, e, l = deletion
 	
 	if abs(l) <= local_seq_size:
@@ -181,10 +180,10 @@ def define_references_for_deletions(out1, genome, deletion):
 	seq_del += genome[ch][e : e + side_length]
 	out1.write(header_seq + seq_del + "\n")
 
-def define_references_for_insertions(out1, genome, insertion):
+def define_references_for_insertions(out1, genome, insertion, side_length):
 	""" Define the reference duplet """
-	local_seq_size = 10000 #size of the generated allelic sequence
-	side_length = int(local_seq_size / 2)
+	local_seq_size = 2 * side_length #size of the generated allelic sequence
+	#side_length = int(local_seq_size / 2)
 	ch, s, l, sequence = insertion
 	
 	#Ref
@@ -216,9 +215,9 @@ def define_references_for_insertions(out1, genome, insertion):
 		out1.write(header + seq + "\n")
 
 
-def define_references_for_inversions(out1, genome, inversion):
-	local_seq_size = 10000 #size of the generated allelic sequence
-	side_length = int(local_seq_size / 2)
+def define_references_for_inversions(out1, genome, inversion, side_length):
+	local_seq_size = 2 * side_length #size of the generated allelic sequence
+	#side_length = int(local_seq_size / 2)
 	ch, s, e, l = inversion
 	
 	if abs(l) <= local_seq_size:
@@ -259,10 +258,10 @@ def define_references_for_inversions(out1, genome, inversion):
 		out1.write(header + seq + "\n")
 
 
-def define_references_for_translocation(out1, genome, translocation):
+def define_references_for_translocation(out1, genome, translocation, side_length):
 	''' '''
-	local_seq_size = 10000 #size of the generated allelic sequence
-	side_length = int(local_seq_size / 2)
+	#local_seq_size = 2 * side_length  #size of the generated allelic sequence
+	#side_length = int(local_seq_size / 2)
 	ch, s, chr2, e, case = translocation
 
 	#ref

@@ -68,10 +68,11 @@ def main(args):
 	min_support = args.minsupport
 	d_over = args.dover
 	d_end = args.dend
-	genotype(paffile, vcffile, output, min_support, d_over, d_end)
+	Ladj = 5000
+	genotype(paffile, vcffile, output, min_support, d_over, d_end, Ladj)
 
 
-def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end):
+def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, Ladj):
 	""" Select alignment if it overlaps a junction and follow specific rules """ 
 	dict_of_informative_aln = {}
 	dict_for_ambiguous_reads = {}
@@ -91,7 +92,7 @@ def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end):
 			if int(quality) < 10:
 				continue
 			# Overlapping filter : Test if read align on one of the junctions
-			if (refStart + d_over) < 5000 < (refEnd - d_over) or (refStart + d_over) < (5000 + svLength) < (refEnd - d_over):
+			if (refStart + d_over) < Ladj < (refEnd - d_over) or (refStart + d_over) < (Ladj + svLength) < (refEnd - d_over):
 				# Rules filter
 				if rules.all_rules(aln, d_end):
 					fill_sv_dict(aln, dict_of_informative_aln)
@@ -161,19 +162,19 @@ def encode_genotype(g):
 	return genotype
 
 
-def allele_normalization(nb_aln_per_allele, svtype, svlength):
+def allele_normalization(nb_aln_per_allele, svtype, svlength, Ladj):
 	''' Allele length normalization '''
-	if svlength > 10000: svlength = 10000
+	if svlength > (2*Ladj): svlength = 2*Ladj #for upper bound, if case of sv size > 2XLadj, only 2 sequences of 2Ladj are represented
 	
 	if svtype == "DEL":
 		nb_aln_longest_allele_seq = nb_aln_per_allele[0]
 		if nb_aln_longest_allele_seq > 0:
-			nb_aln_per_allele[0] = round(nb_aln_longest_allele_seq * 10000 / (10000 + svlength), 3)
+			nb_aln_per_allele[0] = round(nb_aln_longest_allele_seq * (2*Ladj) / ((2*Ladj) + svlength), 3)
 	
 	elif svtype == "INS":
 		nb_aln_longest_allele_seq = nb_aln_per_allele[1]
 		if nb_aln_longest_allele_seq > 0:
-			nb_aln_per_allele[1] = round(nb_aln_longest_allele_seq * 10000 / (10000 + svlength), 3)
+			nb_aln_per_allele[1] = round(nb_aln_longest_allele_seq * (2*Ladj) / ((2*Ladj) + svlength), 3)
 	
 	return nb_aln_per_allele
 

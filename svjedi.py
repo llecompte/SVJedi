@@ -141,10 +141,11 @@ def main(args):
     min_support = args.minsupport
     d_over = args.dover
     d_end = args.dend
+    Ladj = 5000
 
     # generate ref sequence
     if launch_ref is True:
-        generateRef.create_ref(ref_file, vcf_file)
+        generateRef.create_ref(ref_file, vcf_file, Ladj)
 
     # map with minimap2
     if launch_align is True:
@@ -181,7 +182,7 @@ def main(args):
         outErr.close()
 
     # compute genotype
-    genotype.genotype(paf_file, vcf_file, output_file, min_support, d_over, d_end)
+    genotype.genotype(paf_file, vcf_file, output_file, min_support, d_over, d_end, Ladj)
 
 
 if __name__ == "__main__":
