@@ -129,7 +129,7 @@ def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, Ladj
 					elif element[0] == "r":
 						dict_of_informative_aln[region][0].remove(fragment)
 	
-	decision_vcf(dict_of_informative_aln, vcf_without_gt, outputfile, min_aln)
+	decision_vcf(dict_of_informative_aln, vcf_without_gt, outputfile, min_aln, Ladj)
 
 
 def fill_sv_dict(a, dictReadAtJunction):
@@ -179,7 +179,7 @@ def allele_normalization(nb_aln_per_allele, svtype, svlength, Ladj):
 	return nb_aln_per_allele
 
 
-def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
+def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, Ladj):
 	""" Output in VCF format and take genotype decision """
 	getcontext().prec = 28
 	outDecision = open(outputDecision, "w")
@@ -268,7 +268,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln):
 					
 					unbalanced_sv = ("DEL", "INS")
 					if svtype in unbalanced_sv:
-						c1, c2 = allele_normalization(nbAln, svtype, in_length)  # normalization
+						c1, c2 = allele_normalization(nbAln, svtype, in_length, Ladj)  # normalization
 					else:
 						c1, c2 = nbAln
 						   
