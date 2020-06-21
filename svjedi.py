@@ -58,7 +58,6 @@ def parse_arguments(args):
     parser.add_argument("-dend", metavar="<dist_end>", nargs=1, type=int, default=[100], help="soft clipping length allowed for semi global alingments")
 
     parser.add_argument("-Ladj", metavar="<allele_size>", nargs=1, type=int, default=[5000], help="Sequence allele adjacencies at each side of the SV")
-    parser.add_argument("-Ladj", metavar="<allele_size>", nargs=1, type=int, default=[5000], help="Sequence allele adjacencies at each side of the SV")
 	
     parser.add_argument(
         "-ms",
