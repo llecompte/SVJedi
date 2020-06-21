@@ -39,15 +39,19 @@ def main(args):
 	parser.add_argument(
 		"-r", "--ref", metavar="<reffile>", nargs=1, help="fasta format", required=True
 	)
+
+	parser.add_argument("-Ladj", metavar="<allele_size>", nargs=1, type=int, default=5000, help="Sequence allele adjacencies at each side of the SV")
+
 	args = parser.parse_args()
 	
 	genome_file = args.ref[0]
 	vcf_file = args.vcf[0]
-	Ladj = 5000
-	create_ref(genome_file, vcf_file, Ladj)
+	L_adj = args.Ladj
+	create_ref(genome_file, vcf_file, L_adj)
 
 
-def create_ref(genome, set_of_sv, Ladj):
+def create_ref(genome, set_of_sv, L_adj):
+def create_ref(genome, set_of_sv, L_adj):
 	""" Generate triplet of reference """
 	dict_of_chrom = {}
 	list_of_deletions = []
@@ -142,13 +146,13 @@ def create_ref(genome, set_of_sv, Ladj):
 
 	f1 = open(filename_normal, "w")
 	for d in list_of_deletions:
-		define_references_for_deletions(f1, dict_of_chrom, d, Ladj)
+		define_references_for_deletions(f1, dict_of_chrom, d, L_adj)
 	for ins in list_of_insertions:
-		define_references_for_insertions(f1, dict_of_chrom, ins, Ladj)
+		define_references_for_insertions(f1, dict_of_chrom, ins, L_adj)
 	for inv in list_of_inversions:
-		define_references_for_inversions(f1, dict_of_chrom, inv, Ladj)
+		define_references_for_inversions(f1, dict_of_chrom, inv, L_adj)
 	for trans in list_of_translocations:
-		define_references_for_translocation(f1, dict_of_chrom, trans, Ladj)
+		define_references_for_translocation(f1, dict_of_chrom, trans, L_adj)
 	f1.close()
 
 

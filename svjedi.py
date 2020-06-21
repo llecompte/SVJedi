@@ -57,6 +57,8 @@ def parse_arguments(args):
     
     parser.add_argument("-dend", metavar="<dist_end>", nargs=1, type=int, default=100, help="soft clipping length allowed for semi global alingments")
 
+	parser.add_argument("-Ladj", metavar="<allele_size>", nargs=1, type=int, default=5000, help="Sequence allele adjacencies at each side of the SV")
+	
     parser.add_argument(
         "-ms",
         "--minsupport",
@@ -141,11 +143,11 @@ def main(args):
     min_support = args.minsupport
     d_over = args.dover
     d_end = args.dend
-    Ladj = 5000
+    L_adj = args.Ladj
 
     # generate ref sequence
     if launch_ref is True:
-        generateRef.create_ref(ref_file, vcf_file, Ladj)
+        generateRef.create_ref(ref_file, vcf_file, L_adj)
 
     # map with minimap2
     if launch_align is True:
@@ -182,7 +184,7 @@ def main(args):
         outErr.close()
 
     # compute genotype
-    genotype.genotype(paf_file, vcf_file, output_file, min_support, d_over, d_end, Ladj)
+    genotype.genotype(paf_file, vcf_file, output_file, min_support, d_over, d_end, L_adj)
 
 
 if __name__ == "__main__":
