@@ -42,11 +42,11 @@ def main(args):
     
     parser.add_argument("-o", "--output", metavar="<output>", nargs=1, help="output file")
     
-    parser.add_argument("-dover", metavar="<dist_overlap>", nargs=1, type=int, default=100, help="breakpoint distance overlap")
+    parser.add_argument("-dover", metavar="<dist_overlap>", nargs=1, type=int, default=[100], help="breakpoint distance overlap")
     
-    parser.add_argument("-dend", metavar="<dist_end>", nargs=1, type=int, default=100, help="soft clipping length allowed for semi global alingments")
+    parser.add_argument("-dend", metavar="<dist_end>", nargs=1, type=int, default=[100], help="soft clipping length allowed for semi global alingments")
 
-    parser.add_argument("-Ladj", metavar="<allele_size>", nargs=1, type=int, default=5000, help="Sequence allele adjacencies at each side of the SV")
+    parser.add_argument("-Ladj", metavar="<allele_size>", nargs=1, type=int, default=[5000], help="Sequence allele adjacencies at each side of the SV")
 
     parser.add_argument(
         "-ms",
@@ -68,9 +68,9 @@ def main(args):
     vcffile = args.vcf
     paffile = args.paf[0]
     min_support = args.minsupport
-    d_over = args.dover
-    d_end = args.dend
-    L_adj = args.Ladj
+    d_over = args.dover[0]
+    d_end = args.dend[0]
+    L_adj = args.Ladj[0]
     genotype(paffile, vcffile, output, min_support, d_over, d_end, L_adj)
 
 

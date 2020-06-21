@@ -40,13 +40,13 @@ def main(args):
         "-r", "--ref", metavar="<reffile>", nargs=1, help="fasta format", required=True
     )
 
-    parser.add_argument("-Ladj", metavar="<allele_size>", nargs=1, type=int, default=5000, help="Sequence allele adjacencies at each side of the SV")
+    parser.add_argument("-Ladj", metavar="<allele_size>", nargs=1, type=int, default=[5000], help="Sequence allele adjacencies at each side of the SV")
 
     args = parser.parse_args()
     
     genome_file = args.ref[0]
     vcf_file = args.vcf[0]
-    L_adj = args.Ladj
+    L_adj = args.Ladj[0]
     create_ref(genome_file, vcf_file, L_adj)
 
 

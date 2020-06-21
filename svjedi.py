@@ -53,11 +53,12 @@ def parse_arguments(args):
 
     parser.add_argument("-o", "--output", metavar="<output>", nargs=1, help="genotype output file")
     
-    parser.add_argument("-dover", metavar="<dist_overlap>", nargs=1, type=int, default=100, help="breakpoint distance overlap")
+    parser.add_argument("-dover", metavar="<dist_overlap>", nargs=1, type=int, default=[100], help="breakpoint distance overlap")
     
-    parser.add_argument("-dend", metavar="<dist_end>", nargs=1, type=int, default=100, help="soft clipping length allowed for semi global alingments")
+    parser.add_argument("-dend", metavar="<dist_end>", nargs=1, type=int, default=[100], help="soft clipping length allowed for semi global alingments")
 
-    parser.add_argument("-Ladj", metavar="<allele_size>", nargs=1, type=int, default=5000, help="Sequence allele adjacencies at each side of the SV")
+    parser.add_argument("-Ladj", metavar="<allele_size>", nargs=1, type=int, default=[5000], help="Sequence allele adjacencies at each side of the SV")
+    parser.add_argument("-Ladj", metavar="<allele_size>", nargs=1, type=int, default=[5000], help="Sequence allele adjacencies at each side of the SV")
 	
     parser.add_argument(
         "-ms",
@@ -140,10 +141,9 @@ def main(args):
     
     data_type = args.data
     min_support = args.minsupport
-    min_support = args.minsupport
-    d_over = args.dover
-    d_end = args.dend
-    L_adj = args.Ladj
+    d_over = args.dover[0]
+    d_end = args.dend[0]
+    L_adj = args.Ladj[0]
 
     # generate ref sequence
     if launch_ref is True:
