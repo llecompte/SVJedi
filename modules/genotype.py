@@ -82,7 +82,8 @@ def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, L_ad
     with open(inputfile) as file:
         for line in file:
             readId, readLength, readStart, readEnd, _, refId, refLength, refStart, refEnd, match, blockLength, quality, *_ = line.split("\t")
-            refSV = (refId.split("_")[1] + "_" + refId.split("_")[-1]) # ex: ref_2_48990527-636
+            #refSV = (refId.split("_")[1] + "_" + refId.split("_")[-1]) # ex: ref_2_48990527-636
+            refSV = '_'.join(refId.split('_')[1:]) #ref_chrom_1_START_LENGTH > chrom_1_START_LENGTH
             svLength = abs(int(refId.split("-")[-1]))
 
             readLength, readStart, readEnd = (int(readLength), int(readStart), int(readEnd))
@@ -138,8 +139,9 @@ def fill_sv_dict(a, dictReadAtJunction):
     """ If all conditions are true : overlapping and at least one rule is true, save the read """
     read = a.query
     reference = a.target
-    svId = reference.split("_")[1] + "_" + reference.split("_")[-1]
-
+    #svId = reference.split("_")[1] + "_" + reference.split("_")[-1]
+	svId = '_'.join(reference.split('_')[1:])
+	
     if svId not in list(dictReadAtJunction.keys()):
         dictReadAtJunction[svId] = [[], []]
         if reference.startswith("r"):
