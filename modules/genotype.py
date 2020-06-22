@@ -140,8 +140,8 @@ def fill_sv_dict(a, dictReadAtJunction):
     read = a.query
     reference = a.target
     #svId = reference.split("_")[1] + "_" + reference.split("_")[-1]
-	svId = '_'.join(reference.split('_')[1:])
-	
+    svId = '_'.join(reference.split('_')[1:])
+    
     if svId not in list(dictReadAtJunction.keys()):
         dictReadAtJunction[svId] = [[], []]
         if reference.startswith("r"):
