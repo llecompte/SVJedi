@@ -3,7 +3,7 @@
 """*******************************************************************************
     Name: SVjedi 
     Description: SVjedi aims to genotype structural variant with long reads data.
-    Version: 1.1.0
+    Version: 1.1.1
 
     Author: Lolita Lecompte
     Contact: lolita.lecompte@inria.fr, IRISA/Univ Rennes/GenScale, Campus de Beaulieu, 35042 Rennes Cedex, France
@@ -24,7 +24,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 *******************************************************************************"""
-__version__ = '1.1.0'
+__version__ = '1.1.1'
 
 import os.path
 from os import path
@@ -53,10 +53,12 @@ def parse_arguments(args):
 
     parser.add_argument("-o", "--output", metavar="<output>", nargs=1, help="genotype output file")
     
-    parser.add_argument("-dover", metavar="<dist_overlap>", nargs=1, type=int, default=100, help="breakpoint distance overlap")
+    parser.add_argument("-dover", metavar="<dist_overlap>", nargs=1, type=int, default=[100], help="breakpoint distance overlap")
     
-    parser.add_argument("-dend", metavar="<dist_end>", nargs=1, type=int, default=100, help="soft clipping length allowed for semi global alingments")
+    parser.add_argument("-dend", metavar="<dist_end>", nargs=1, type=int, default=[100], help="soft clipping length allowed for semi global alingments")
 
+    parser.add_argument("-ladj", metavar="<allele_size>", nargs=1, type=int, default=[5000], help="Sequence allele adjacencies at each side of the SV")
+	
     parser.add_argument(
         "-ms",
         "--minsupport",
@@ -138,13 +140,13 @@ def main(args):
     
     data_type = args.data
     min_support = args.minsupport
-    min_support = args.minsupport
-    d_over = args.dover
-    d_end = args.dend
+    d_over = args.dover[0]
+    d_end = args.dend[0]
+    l_adj = args.ladj[0]
 
     # generate ref sequence
     if launch_ref is True:
-        generateRef.create_ref(ref_file, vcf_file)
+        generateRef.create_ref(ref_file, vcf_file, l_adj)
 
     # map with minimap2
     if launch_align is True:
@@ -181,7 +183,7 @@ def main(args):
         outErr.close()
 
     # compute genotype
-    genotype.genotype(paf_file, vcf_file, output_file, min_support, d_over, d_end)
+    genotype.genotype(paf_file, vcf_file, output_file, min_support, d_over, d_end, l_adj)
 
 
 if __name__ == "__main__":
