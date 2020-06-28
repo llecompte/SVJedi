@@ -46,7 +46,7 @@ def main(args):
     
     parser.add_argument("-dend", metavar="<dist_end>", nargs=1, type=int, default=[100], help="soft clipping length allowed for semi global alingments")
 
-    parser.add_argument("-Ladj", metavar="<allele_size>", nargs=1, type=int, default=[5000], help="Sequence allele adjacencies at each side of the SV")
+    parser.add_argument("-ladj", metavar="<allele_size>", nargs=1, type=int, default=[5000], help="Sequence allele adjacencies at each side of the SV")
 
     parser.add_argument(
         "-ms",
@@ -70,11 +70,11 @@ def main(args):
     min_support = args.minsupport
     d_over = args.dover[0]
     d_end = args.dend[0]
-    L_adj = args.Ladj[0]
-    genotype(paffile, vcffile, output, min_support, d_over, d_end, L_adj)
+    l_adj = args.ladj[0]
+    genotype(paffile, vcffile, output, min_support, d_over, d_end, l_adj)
 
 
-def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, L_adj):
+def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, l_adj):
     """ Select alignment if it overlaps a junction and follow specific rules """ 
     dict_of_informative_aln = {}
     dict_for_ambiguous_reads = {}
@@ -95,7 +95,7 @@ def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, L_ad
             if int(quality) < 10:
                 continue
             # Overlapping filter : Test if read align on one of the junctions
-            if (refStart + d_over) < L_adj < (refEnd - d_over) or (refStart + d_over) < (L_adj + svLength) < (refEnd - d_over):
+            if (refStart + d_over) < l_adj < (refEnd - d_over) or (refStart + d_over) < (l_adj + svLength) < (refEnd - d_over):
                 # Rules filter
                 if rules.all_rules(aln, d_end):
                     fill_sv_dict(aln, dict_of_informative_aln)
@@ -132,7 +132,7 @@ def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, L_ad
                     elif element[0] == "r":
                         dict_of_informative_aln[region][0].remove(fragment)
     
-    decision_vcf(dict_of_informative_aln, vcf_without_gt, outputfile, min_aln, L_adj)
+    decision_vcf(dict_of_informative_aln, vcf_without_gt, outputfile, min_aln, l_adj)
 
 
 def fill_sv_dict(a, dictReadAtJunction):
@@ -166,24 +166,24 @@ def encode_genotype(g):
     return genotype
 
 
-def allele_normalization(nb_aln_per_allele, svtype, svlength, L_adj):
+def allele_normalization(nb_aln_per_allele, svtype, svlength, l_adj):
     ''' Allele length normalization '''
-    if svlength > (2*L_adj): svlength = 2*L_adj #for upper bound, if case of sv size > 2XLadj, only 2 sequences of 2Ladj are represented
+    if svlength > (2*l_adj): svlength = 2*l_adj #for upper bound, if case of sv size > 2XLadj, only 2 sequences of 2Ladj are represented
     
     if svtype == "DEL":
         nb_aln_longest_allele_seq = nb_aln_per_allele[0]
         if nb_aln_longest_allele_seq > 0:
-            nb_aln_per_allele[0] = round(nb_aln_longest_allele_seq * (2*L_adj) / ((2*L_adj) + svlength), 3)
+            nb_aln_per_allele[0] = round(nb_aln_longest_allele_seq * (2*l_adj) / ((2*l_adj) + svlength), 3)
     
     elif svtype == "INS":
         nb_aln_longest_allele_seq = nb_aln_per_allele[1]
         if nb_aln_longest_allele_seq > 0:
-            nb_aln_per_allele[1] = round(nb_aln_longest_allele_seq * (2*L_adj) / ((2*L_adj) + svlength), 3)
+            nb_aln_per_allele[1] = round(nb_aln_longest_allele_seq * (2*l_adj) / ((2*l_adj) + svlength), 3)
     
     return nb_aln_per_allele
 
 
-def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, L_adj):
+def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
     """ Output in VCF format and take genotype decision """
     getcontext().prec = 28
     outDecision = open(outputDecision, "w")
@@ -272,7 +272,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, L_adj):
                     
                     unbalanced_sv = ("DEL", "INS")
                     if svtype in unbalanced_sv:
-                        c1, c2 = allele_normalization(nbAln, svtype, in_length, L_adj)  # normalization
+                        c1, c2 = allele_normalization(nbAln, svtype, in_length, l_adj)  # normalization
                     else:
                         c1, c2 = nbAln
                            
