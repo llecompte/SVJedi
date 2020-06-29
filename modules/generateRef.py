@@ -308,17 +308,17 @@ def translocation_cases(alt):
         #piece extending to the right of p is joined after t
         case = 'after_piece'
         
-    elif type_sv.endswith(']'):
+    elif alt.endswith(']'):
         #t]p]   
         #reverse comp piece extending left of p is joined after t   
         case = 'after_revcomp'
             
-    elif type_sv.startswith(']'):
+    elif alt.startswith(']'):
         #]p]t
         #piece extending to the left of p is joined before t 
         case = 'before_piece'
         
-    elif type_sv.startswith('['):
+    elif alt.startswith('['):
         #[p[t[
         #reverse comp piece extending right of p is joined before t 
         case = 'before_revcomp'
