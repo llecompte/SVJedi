@@ -245,10 +245,20 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                 elif svtype == 'BND': 
                     if in_info.startswith("END="):
                         end = in_info.split("END=")[1].split(';')[0]
-                    else:
+                    elif ";END=" in in_info:
                         end = in_info.split(";END=")[1].split(';')[0]   
-    
-                    chr2 = in_info.split("CHR2=")[1].split(";")[0]
+                    elif "[" in  in_type:
+                        end = in_type.split(':')[1].split('[')[0]
+                    elif "]" in  in_type:
+                        end = in_type.split(':')[1].split(']')[0]
+                    
+                    if 'CHR2=' in info: 
+                        chr2 = in_info.split('CHR2=')[1].split(';')[0]
+                    elif '[' in in_type:
+                            chr2 = in_type.split(':')[0].split('[')[1]     #ALT[CHR2:POSTION[
+                    elif ']' in in_type:
+                            chr2 = in_type.split(':')[0].split(']')[1]     #ALT]CHR2:POSTION]
+                            
                     in_sv = in_chrom + "_" + in_start + "-" + chr2 + "-" + end #define sv id for TRANS
                 
                 
