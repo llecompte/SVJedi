@@ -252,7 +252,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                     elif "]" in  in_type:
                         end = in_type.split(':')[1].split(']')[0]
                     
-                    if 'CHR2=' in info: 
+                    if 'CHR2=' in in_info: 
                         chr2 = in_info.split('CHR2=')[1].split(';')[0]
                     elif '[' in in_type:
                             chr2 = in_type.split(':')[0].split('[')[1]     #ALT[CHR2:POSTION[
