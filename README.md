@@ -83,6 +83,7 @@ SVJedi two different usages from non aligned reads or from aligned reads (PAF fo
 | -ms/--minsupport | Minimum number of informative alignments to assign a genotype
 | -dover       | Breakpoint distance overlap required (default 100 bp) |
 | -dend        | Soft-clipping length allowed to consider a semi-global alignment (default 100 bp) |
+| -ladj	       | Length of sequences adjacent to each end of breakpoints (default 5,000 bp) |
 | -d/--data    | Type of sequencing data, either *ont* or *pb* (default pb)  |
 | -t/--threads | Number of threads for mapping             |
 | -h/--help    | Show help                                 |
