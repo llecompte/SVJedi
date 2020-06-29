@@ -142,7 +142,14 @@ def create_ref(genome, set_of_sv, l_adj):
                     if chrom2 not in list(dict_of_chrom.keys()): continue
                     else: 
                         trans_case = translocation_cases(type_sv) #determine the translocation case
-                        end = int(info.split(';END=')[1].split(';')[0])
+                        
+                        if ';END=' in info: 
+							end = int(info.split(';END=')[1].split(';')[0])
+						elif '[' in type_sv:
+                            end = type_sv.split(':')[1].split('[')[0]     #ALT[CHR2:POSTION[
+						elif ']' in type_sv:
+                            end = type_sv.split(':')[1].split(']')[0]     #ALT]CHR2:POSTION]
+                            
                         list_of_translocations.append((chrom, start, chrom2, end, trans_case))
                         
                         
