@@ -132,7 +132,13 @@ def create_ref(genome, set_of_sv, l_adj):
                 #for translocations
                 elif svtype == 'BND':
                     start = int(start)
-                    chrom2 = info.split('CHR2=')[1].split(';')[0]
+                    if 'CHR2' in info: 
+						chrom2 = info.split('CHR2=')[1].split(';')[0]
+					elif '[' in svtype:
+							chrom2 = svtype.split(':')[0].split('[')[1] 	#ALT[CHR2:POSTION[
+					elif ']' in svtype:
+							chrom2 = svtype.split(':')[0].split(']')[1]		#ALT]CHR2:POSTION]
+							
                     if chrom2 not in list(dict_of_chrom.keys()): continue
                     else: 
                         trans_case = translocation_cases(type_sv) #determine the translocation case
