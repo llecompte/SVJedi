@@ -261,8 +261,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                             
                     in_sv = in_chrom + "_" + in_start + "-" + chr2 + "-" + end #define sv id for TRANS
                 
-                
-               else:
+                else:
                     nbAln = [0,0]
                     prob = [".",".","."]
                    
