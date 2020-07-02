@@ -262,11 +262,13 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                     in_sv = in_chrom + "_" + in_start + "-" + chr2 + "-" + end #define sv id for TRANS
                 
                 
-                elif svtype == '':
-                    continue
-                
-                
-                
+               else:
+                    nbAln = [0,0]
+                    prob = [".",".","."]
+                   
+               #elif svtype == '':
+               #    continue
+             
                 if svtype in ('DEL', 'INS', 'INV'):         
                     if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
                     in_sv = in_chrom + "_" + in_start + "-" + str(in_length) #define sv id for DEL, INS, INV
@@ -274,7 +276,6 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                 
                 if in_sv not in list(dictReadAtJunction.keys()):
                     nbAln = [0,0]
-                    geno = "./."
                     prob = [".",".","."]
                                        
                 else:
