@@ -183,7 +183,7 @@ def allele_normalization(nb_aln_per_allele, svtype, svlength, l_adj):
     return nb_aln_per_allele
 
 
-def likelihood(all_count, svtype, svlength, l_adj):
+def likelihood(all_count, svtype, svlength, minNbAln, l_adj):
     """ Compute likelihood """
     
     unbalanced_sv = ("DEL", "INS")
@@ -322,7 +322,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                 
                 if svtype in ('DEL', 'INS', 'INV', 'BND') and in_sv in list(dictReadAtJunction.keys()):
                     nbAln = [len(x) for x in dictReadAtJunction[in_sv]]
-                    genotype, proba = likelihood(nbAln, svtype, in_length, l_adj)
+                    genotype, proba = likelihood(nbAln, svtype, in_length, minNbAln, l_adj)
             
                 else: #if svtype different from DEL, INS, INV, BND or if sv not in supported by alignment
                     nbAln = [0,0]
