@@ -184,49 +184,49 @@ def allele_normalization(nb_aln_per_allele, svtype, svlength, l_adj):
 
 
 def likelihood(all_count, svtype, svlength, l_adj):
-	""" Compute likelihood """
-	
-	unbalanced_sv = ("DEL", "INS")
-	if svtype in unbalanced_sv:
-		c1, c2 = allele_normalization(all_count, svtype, svlength, l_adj)  # allelic sequence normalization for unbalanced SV
-	else:
-		c1, c2 = all_count
-	
-	rc1 = int(round(c1,0))
-	rc2 = int(round(c2,0))
-	e = 0.00005 #sequencing err
+    """ Compute likelihood """
+    
+    unbalanced_sv = ("DEL", "INS")
+    if svtype in unbalanced_sv:
+        c1, c2 = allele_normalization(all_count, svtype, svlength, l_adj)  # allelic sequence normalization for unbalanced SV
+    else:
+        c1, c2 = all_count
+    
+    rc1 = int(round(c1,0))
+    rc2 = int(round(c2,0))
+    e = 0.00005 #sequencing err
 
-	lik0 = Decimal(c1*math.log10(1-e)) + Decimal(c2*math.log10(e)) 
-	lik1 = Decimal((c1+c2)*math.log10(1/2)) 
-	lik2 = Decimal(c2*math.log10(1-e)) + Decimal(c1*math.log10(e))
-	
-	L = [lik0, lik1, lik2]
-	
-	index_of_L_max = [i for i, x in enumerate(L) if x == max(L)]
-	if len(index_of_L_max) == 1: 
-		geno_not_encoded = str(index_of_L_max[0])
-		geno = encode_genotype(geno_not_encoded)
-		
-	else:
-		geno = "./."    #no genotype estimation since likelihood are not conclusive
-	
-	#Check for minimum number of alignment to assign a genotype
-	if not sum(all_count) >= minNbAln: # minimum support
-		geno = "./."
-				
-	combination = Decimal(math.factorial(rc1 + rc2)) / Decimal(math.factorial(rc1)) / Decimal(math.factorial(rc2))
-	lik0 += combination 
-	lik1 += combination
-	lik2 += combination
+    lik0 = Decimal(c1*math.log10(1-e)) + Decimal(c2*math.log10(e)) 
+    lik1 = Decimal((c1+c2)*math.log10(1/2)) 
+    lik2 = Decimal(c2*math.log10(1-e)) + Decimal(c1*math.log10(e))
+    
+    L = [lik0, lik1, lik2]
+    
+    index_of_L_max = [i for i, x in enumerate(L) if x == max(L)]
+    if len(index_of_L_max) == 1: 
+        geno_not_encoded = str(index_of_L_max[0])
+        geno = encode_genotype(geno_not_encoded)
+        
+    else:
+        geno = "./."    #no genotype estimation since likelihood are not conclusive
+    
+    #Check for minimum number of alignment to assign a genotype
+    if not sum(all_count) >= minNbAln: # minimum support
+        geno = "./."
+                
+    combination = Decimal(math.factorial(rc1 + rc2)) / Decimal(math.factorial(rc1)) / Decimal(math.factorial(rc2))
+    lik0 += combination 
+    lik1 += combination
+    lik2 += combination
 
-	#phred scaled score
-	prob0 = -10*lik0
-	prob1 = -10*lik1
-	prob2 = -10*lik2                                 
-				 
-	prob = [str(int(prob0)), str(int(prob1)), str(int(prob2))]
-			
-	return geno, prob
+    #phred scaled score
+    prob0 = -10*lik0
+    prob1 = -10*lik1
+    prob2 = -10*lik2                                 
+                 
+    prob = [str(int(prob0)), str(int(prob1)), str(int(prob2))]
+            
+    return geno, prob
                     
 
 def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
@@ -272,7 +272,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                         else:
                             in_length = abs(int(in_info.split("SVLEN=")[1].split(";")[0]))
                 
-					if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
+                    if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
                     in_sv = in_chrom + "_" + in_start + "-" + str(in_length) #define sv id for DEL, INS, INV
                     
                 
@@ -321,8 +321,8 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                 #Asign genotype 
                 
                 if svtype in ('DEL', 'INS', 'INV', 'BND') and in_sv in list(dictReadAtJunction.keys()):
-					nbAln = [len(x) for x in dictReadAtJunction[in_sv]]
-					genotype, proba = likelihood(nbAln, svtype, in_length, l_adj)
+                    nbAln = [len(x) for x in dictReadAtJunction[in_sv]]
+                    genotype, proba = likelihood(nbAln, svtype, in_length, l_adj)
             
                 else: #if svtype different from DEL, INS, INV, BND or if sv not in supported by alignment
                     nbAln = [0,0]
