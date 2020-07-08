@@ -272,7 +272,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                         else:
                             in_length = abs(int(in_info.split("SVLEN=")[1].split(";")[0]))
                 
-                    if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
+                    #if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
                     in_sv = in_chrom + "_" + in_start + "-" + str(in_length) #define sv id for DEL, INS, INV
                     
                 
@@ -280,7 +280,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                 elif svtype == 'INS': 
                     in_length = len(in_type) 
                     
-                    if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
+                    #if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
                     in_sv = in_chrom + "_" + in_start + "-" + str(in_length) #define sv id for DEL, INS, INV
                 
                 
@@ -292,7 +292,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                         end = in_info.split(";END=")[1].split(';')[0]               
                     in_length = int(end) - int(in_start)
                     
-                    if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
+                    #if abs(in_length) < 50: continue #focus on svlength of at least 50 bp
                     in_sv = in_chrom + "_" + in_start + "-" + str(in_length) #define sv id for DEL, INS, INV
 
 
@@ -320,7 +320,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                 #######################################################################################
                 #Asign genotype 
                 
-                if svtype in ('DEL', 'INS', 'INV', 'BND') and in_sv in list(dictReadAtJunction.keys()):
+                if svtype in ('DEL', 'INS', 'INV', 'BND') and in_sv in list(dictReadAtJunction.keys()) and abs(in_length) >= 50:
                     nbAln = [len(x) for x in dictReadAtJunction[in_sv]]
                     genotype, proba = likelihood(nbAln, svtype, in_length, minNbAln, l_adj)
             
