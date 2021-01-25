@@ -327,7 +327,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                 else: #if svtype different from DEL, INS, INV, BND or if sv not in supported by alignment
                     nbAln = [0,0]
                     genotype = "./."
-                    prob = [".",".","."]
+                    proba = [".",".","."]
                 
                     
                 #######################################################################################
