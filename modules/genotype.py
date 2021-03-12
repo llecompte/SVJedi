@@ -184,7 +184,7 @@ def allele_normalization(nb_aln_per_allele, svtype, svlength, l_adj):
 
 
 def likelihood(all_count, svtype, svlength, minNbAln, l_adj):
-    """ Compute likelihood """
+    """ Compute likelihoods """
     
     unbalanced_sv = ("DEL", "INS")
     if svtype in unbalanced_sv:
@@ -194,7 +194,7 @@ def likelihood(all_count, svtype, svlength, minNbAln, l_adj):
     
     rc1 = int(round(c1,0))
     rc2 = int(round(c2,0))
-    e = 0.00005 #sequencing err
+    e = 0.00005 # the probability that a read maps to a given allele erroneously
 
     lik0 = Decimal(c1*math.log10(1-e)) + Decimal(c2*math.log10(e)) 
     lik1 = Decimal((c1+c2)*math.log10(1/2)) 
@@ -208,18 +208,18 @@ def likelihood(all_count, svtype, svlength, minNbAln, l_adj):
         geno = encode_genotype(geno_not_encoded)
         
     else:
-        geno = "./."    #no genotype estimation since likelihood are not conclusive
+        geno = "./."    #no genotype estimation since likelihoods are not conclusive
     
     #Check for minimum number of alignment to assign a genotype
     if not sum(all_count) >= minNbAln: # minimum support
         geno = "./."
                 
-    combination = Decimal(math.factorial(rc1 + rc2)) / Decimal(math.factorial(rc1)) / Decimal(math.factorial(rc2))
+    combination = Decimal(math.log10(math.comb(rc1+rc2,rc1)))
     lik0 += combination 
     lik1 += combination
     lik2 += combination
 
-    #phred scaled score
+    #phred scaled likelihoods
     prob0 = -10*lik0
     prob1 = -10*lik1
     prob2 = -10*lik2                                 
