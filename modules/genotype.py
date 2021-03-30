@@ -315,7 +315,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                             chr2 = in_type.split(':')[0].split(']')[1]     #ALT]CHR2:POSTION]
                             
                     in_sv = in_chrom + "_" + in_start + "-" + chr2 + "-" + end #define sv id for TRANS
-                
+                    in_length = 100000  # to pass the SV size filter                
                 
                 #######################################################################################
                 #Asign genotype 
