@@ -236,12 +236,14 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
     with open(inputVCF) as inputFile:
         for line in inputFile:
             if line.startswith("##"):
-                outDecision.write(line)
+                if not line.startswith("##FORMAT"):
+                    outDecision.write(line)
 
             elif line.startswith("#C"):
                 outDecision.write('##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">\n')
-                outDecision.write('##FORMAT=<ID=DP,Number=1,Type=Integer,Description="Cumulated depth accross samples (sum)">\n')
-                outDecision.write('##FORMAT=<ID=AD,Number=2,Type=Integer,Description="Depth of each allele by sample">\n')
+                outDecision.write('##FORMAT=<ID=DP,Number=1,Type=Float,Description="Total number of informative reads across all alleles (after normalization for unbalanced SVs)">\n')
+                outDecision.write('##FORMAT=<ID=AD,Number=2,Type=Float,Description="Number of informative reads supporting each allele (after normalization for unbalanced SVs)">\n')
+                outDecision.write('##FORMAT=<ID=PL,Number=3,Type=Integer,Description="Phred-scaled likelihood for each genotype">\n')
                 outDecision.write(line.rstrip("\n") + "\t" + "\t".join(["FORMAT", "SAMPLE"]) + "\n")
 
             else:
