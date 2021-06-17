@@ -1,6 +1,6 @@
 # SVJedi : Genotyping structural variations with long read data
 
-[![License](http://img.shields.io/:license-affero-blue.svg)](http://www.gnu.org/licenses/agpl-3.0.en.html)
+[![License](http://img.shields.io/:license-affero-blue.svg)](http://www.gnu.org/licenses/agpl-3.0.en.html) [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/svjedi/README.html)
 
 SVJedi is a structural variation (SV) genotyper for long read data. 
 Based on a representation of the different alleles, it estimates the genotype of each variant in a given individual sample based on allele-specific alignment counts.
