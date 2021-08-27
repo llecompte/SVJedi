@@ -229,9 +229,28 @@ def likelihood(all_count, svtype, svlength, minNbAln, l_adj):
     return geno, prob
                     
 
+def type_format(inputVCF, svjedi_gt_format):
+    """ Check type of FORMAT column """
+    with open(inputVCF) as inputFile:
+        for l in inputFile:
+            if l.startswith("#C"):
+                #check genotype FORMAT on next line
+                index_format = l.rstrip('\n').split('\t').index("FORMAT")
+                previous_format = next(inputFile).rstrip('\n').split('\t')[index_format]
+                
+                bool_same_format = (previous_format == svjedi_gt_format)
+                break
+                    
+    return bool_same_format
+
+    #return type scenario
+
 def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
     """ Output in VCF format and take genotype decision """
+    
     getcontext().prec = 28
+    svjedi_genotype_format = "GT:DP:AD:PL"
+    
     outDecision = open(outputDecision, "w")
     with open(inputVCF) as inputFile:
         for line in inputFile:
@@ -244,7 +263,16 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                 outDecision.write('##FORMAT=<ID=DP,Number=1,Type=Float,Description="Total number of informative reads across all alleles (after normalization for unbalanced SVs)">\n')
                 outDecision.write('##FORMAT=<ID=AD,Number=2,Type=Float,Description="Number of informative reads supporting each allele (after normalization for unbalanced SVs)">\n')
                 outDecision.write('##FORMAT=<ID=PL,Number=3,Type=Integer,Description="Phred-scaled likelihood for each genotype">\n')
-                outDecision.write(line.rstrip("\n") + "\t" + "\t".join(["FORMAT", "SAMPLE"]) + "\n")
+
+                if "FORMAT" in line:
+                    identical_format = type_format(inputVCF, svjedi_genotype_format)
+                    if identical_format:
+                        outDecision.write(line.rstrip("\n") + "\tSAMPLE\n") #keep previous SAMPLE(S) and add new SAMPLE column
+                    else:
+                        outDecision.write("\t".join(line.split('\t')[:8 ]) + "\t" + "\t".join(["FORMAT", "SAMPLE"]) + "\n") #remove previous FORMAT and SAMPLE(S) columns
+                                        
+                elif len(line.split('\t'))<=8:
+                    outDecision.write(line.rstrip('\n') + '\t' + '\t'.join(["FORMAT", "SAMPLE"]) + '\n')
 
             else:
                 in_chrom, in_start, _, __, in_type, ___, ____, in_info, *_ = line.rstrip("\n").split("\t")
@@ -336,11 +364,12 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                 #Output genotype in VCF
                 
                 numbers = ",".join(str(y) for y in nbAln)
+                
                 if len(line.split("\t")) <= 8:
                     new_line = (
                         line.rstrip("\n")
                         + "\t"
-                        + "GT:DP:AD:PL"
+                        + svjedi_genotype_format
                         + "\t"
                         + genotype
                         + ":"
@@ -353,22 +382,39 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                     outDecision.write(new_line + "\n")
 
                 else:
-                    line_without_genotype = line.split("\t")[0:8]
-                    new_line = (
-                        "\t".join(line_without_genotype)
-                        + "\t"
-                        + "GT:DP:AD:PL"
-                        + "\t"
-                        + genotype
-                        + ":"
-                        + str(round(sum(nbAln), 3))
-                        + ":"
-                        + str(numbers)
-                        + ":"
-                        + str(','.join(proba))
-                    )
-                    outDecision.write(new_line + "\n")
+                    if identical_format: #check if previous FORMAT correspond to SVJedi genotype FORMAT
+                            new_line = (
+                                line.rstrip("\n")
+                                + "\t"
+                                + genotype
+                                + ":"
+                                + str(round(sum(nbAln), 3))
+                                + ":"
+                                + str(numbers)
+                                + ":"
+                                + str(','.join(proba))
+                            )
+                            outDecision.write(new_line + "\n")
+                    
+                    else: # else if previous FORMAT do not correspond to SVJedi genotype FORMAT
+                        line_without_genotype = line.split("\t")[0:8]
+                        new_line = (
+                            "\t".join(line_without_genotype)
+                            + "\t"
+                            + svjedi_genotype_format
+                            + "\t"
+                            + genotype
+                            + ":"
+                            + str(round(sum(nbAln), 3))
+                            + ":"
+                            + str(numbers)
+                            + ":"
+                            + str(','.join(proba))
+                        )
+                        outDecision.write(new_line + "\n")
+                
 
+                    
     outDecision.close()
 
 
