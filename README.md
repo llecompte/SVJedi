@@ -51,6 +51,9 @@ Example command line:
 
 	python3 svjedi.py -v Data/HG002_son/HG002_20SVs_Tier1_v0.6_PASS.vcf -a Data/HG002_son/reference_at_breakpoints.fasta -i Data/HG002_son/PacBio_reads_set.fastq.gz -o Data/HG002_son/genotype_results.vcf
 
+Note: Genotyping results in `Data/HG002_son/expected_genotype_results.vcf` were obtained using Minimap2 version 2.17-r941.
+ 
+ 
 
 The folder Data/C_elegans includes an example on 12 SVs (del, ins, inv, bnd) to genotype with a small synthetic read dataset on a subset of the *Caenorhabditis elegans* genome.
 
