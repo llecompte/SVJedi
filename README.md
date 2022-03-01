@@ -21,7 +21,7 @@ SVJedi is organized in three main steps:
 ### Requirements
 
 - Python3
-- Minimap2
+- Minimap2 (we recommend using version 2.17-r941)
 - NumPy
 - Biopython
 
@@ -114,10 +114,10 @@ Here are the information needed for SVJedi to genotype the following SV types. A
 
 ### Reference
 
-SVJedi: Genotyping structural variations with long reads. Lecompte L, Peterlongo P, Lavenier D, Lemaitre C. *Bioinformatics* 2020 [doi:10.1093/bioinformatics/btaa527](https://academic.oup.com/bioinformatics/advance-article-abstract/doi/10.1093/bioinformatics/btaa527/5841661) ([bioRxiv preprint](https://www.biorxiv.org/content/10.1101/849208v1))
+SVJedi: Genotyping structural variations with long reads. Lecompte L, Peterlongo P, Lavenier D, Lemaitre C. *Bioinformatics* 2020, 36(17):4568–4575 [doi:10.1093/bioinformatics/btaa527](https://academic.oup.com/bioinformatics/article/36/17/4568/5841661) ([bioRxiv preprint](https://www.biorxiv.org/content/10.1101/849208v1))
 
 
 ### Contact
 
-SVJedi is a [Genscale](http://team.inria.fr/genscale/) tool developed by Lolita Lecompte <lolita.lecompte@inria.fr>
+SVJedi is a [Genscale](http://team.inria.fr/genscale/) tool developed by Lolita Lecompte. For any bug report or feedback, please use the Issues form of Github. 
 
