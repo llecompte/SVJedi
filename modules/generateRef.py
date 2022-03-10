@@ -178,23 +178,23 @@ def define_references_for_deletions(out1, genome, deletion, side_length):
     if abs(l) <= local_seq_size:
         ### breakpoint withOUT deletion
         header = ">ref_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][s - (side_length + 1): e + side_length]
+        seq = genome[ch][max(0, s - (side_length + 1)): e + side_length]
         out1.write(header + seq + "\n")
 
     else:
         # left breakpoint withOUT deletion
         header = ">refLeft_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][s - (side_length + 1) : s + side_length]
+        seq = genome[ch][max(0, s - (side_length + 1)) : s + side_length]
         out1.write(header + seq + "\n")
 
         # right breakpoint withOUT deletion
         header = ">refRight_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][e - (side_length + 1) : e + side_length]
+        seq = genome[ch][max(0, e - (side_length + 1)) : e + side_length]
         out1.write(header + seq + "\n")
 
     ### breakpoint WITH the deletion
     header_seq = ">del_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-    seq_del = genome[ch][s - (side_length + 1) : s]
+    seq_del = genome[ch][max(0, s - (side_length + 1)) : s]
     seq_del += genome[ch][e : e + side_length]
     out1.write(header_seq + seq_del + "\n")
 
@@ -206,7 +206,7 @@ def define_references_for_insertions(out1, genome, insertion, side_length):
     
     #Ref
     header_seq = ">ref_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-    seq_ins = genome[ch][s - side_length : s]
+    seq_ins = genome[ch][max(0, s - side_length) : s]
     seq_ins += genome[ch][s : s + side_length]
     out1.write(header_seq + seq_ins + "\n")
     
@@ -214,7 +214,7 @@ def define_references_for_insertions(out1, genome, insertion, side_length):
     if abs(l) <= local_seq_size:
         ### breakpoint with insertion
         header = ">ins_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][s - side_length : s]
+        seq = genome[ch][max(0, s - side_length) : s]
         seq += sequence
         seq += genome[ch][s:s + side_length]
         out1.write(header + seq + "\n")
@@ -222,7 +222,7 @@ def define_references_for_insertions(out1, genome, insertion, side_length):
     else:
         # left breakpoint with insertion
         header = ">insLeft_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][s - side_length : s]
+        seq = genome[ch][max(0, s - side_length) : s]
         seq += sequence[:side_length]
         out1.write(header + seq + "\n")
 
@@ -241,12 +241,12 @@ def define_references_for_inversions(out1, genome, inversion, side_length):
     if abs(l) <= local_seq_size:
         #ref
         header = ">ref_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][s - side_length : e + side_length]
+        seq = genome[ch][max(0, s - side_length) : e + side_length]
         out1.write(header + seq + "\n")
         
         #alt
         header = ">inv_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n" 
-        seq = genome[ch][s - side_length : s] #add inv left side
+        seq = genome[ch][max(0, s - side_length) : s] #add inv left side
         inversion = Seq(genome[ch][s : e])
         seq += str(inversion.reverse_complement()) #add rev comp seq
         seq += genome[ch][e : e + side_length] #add right side
@@ -255,17 +255,17 @@ def define_references_for_inversions(out1, genome, inversion, side_length):
     else:
         #ref
         header = ">refLeft_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][s - side_length : s + side_length]
+        seq = genome[ch][max(0, s - side_length) : s + side_length]
         out1.write(header + seq + "\n")
         
         header = ">refRight_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n"
-        seq = genome[ch][e - side_length : e + side_length]
+        seq = genome[ch][max(0, e - side_length) : e + side_length]
         out1.write(header + seq + "\n")
    
         #alt
         header = ">invLeft_" + str(ch) + "_" + str(s) + "-" + str(abs(l)) + "\n" 
-        seq = genome[ch][s - side_length : s] #add inv left side
-        inversion = Seq(genome[ch][e - side_length: e])
+        seq = genome[ch][max(0, s - side_length) : s] #add inv left side
+        inversion = Seq(genome[ch][max(0, e - side_length): e])
         seq += str(inversion.reverse_complement()) #add rev comp seq
         out1.write(header + seq + "\n")
        
@@ -284,27 +284,27 @@ def define_references_for_translocation(out1, genome, translocation, side_length
 
     #ref
     header = ">ref_" + str(ch) + "_" + str(s) + "-" + chr2 + "-" + str(e) + "\n"
-    seq = genome[ch][s - side_length : s + side_length]
+    seq = genome[ch][max(0, s - side_length) : s + side_length]
     out1.write(header + seq + "\n")
     
     #alt
     header = ">bnd_" + str(ch) + "_" + str(s) + "-" + chr2 + "-" + str(e) + "\n" 
     seq = ''
-    if case == 'after_piece':
-        seq = genome[ch][s - side_length : s] #add inv left side
-        seq += genome[chr2][e : e + side_length] #add right side
+    if case == 'after_piece':  # t[p[       piece extending to the right of p is joined after t  (from VCFv4.2.pdf)
+        seq = genome[ch][max(0, s - side_length) : s] #BND chr1 left side
+        seq += genome[chr2][e : e + side_length] #add BND chr2 right side
     
-    elif case == 'after_revcomp':
-        seq = genome[ch][s - side_length : s] #add inv left side
-        seq += str(Seq(genome[chr2][e - side_length : e]).reverse_complement()) #add right side
+    elif case == 'after_revcomp': # t]p]    reverse comp piece extending left of p is joined after t
+        seq = genome[ch][max(0, s - side_length) : s] #BND chr1 left side
+        seq += str(Seq(genome[chr2][e - side_length : e]).reverse_complement()) #add BND chr2 left side (revcomp)
         
-    elif case == 'before_piece':
-        seq = genome[chr2][e - side_length : e] #add right side
-        seq += genome[ch][s : s + side_length]
+    elif case == 'before_piece': # ]p]t     piece extending to the left of p is joined before t
+        seq = genome[chr2][max(0, e - side_length) : e] #BND chr2 left side
+        seq += genome[ch][s : s + side_length] #add BND chr1 right side
         
-    elif case == 'before_revcomp':
-        seq = str(Seq(genome[chr2][e : e + side_length]).reverse_complement()) #add right side
-        seq += genome[ch][s : s + side_length]
+    elif case == 'before_revcomp': # [p[t   reverse comp piece extending right of p is joined before t
+        seq = str(Seq(genome[chr2][e : e + side_length]).reverse_complement()) #BND chr2 right side (revcomp)
+        seq += genome[ch][s : s + side_length]  #add BND chr1 right side
         
     out1.write(header + seq + "\n")
 
