@@ -138,6 +138,8 @@ def create_ref(genome, set_of_sv, l_adj):
                             chrom2 = type_sv.split(':')[0].split('[')[1]     #ALT[CHR2:POSTION[
                     elif ']' in type_sv:
                             chrom2 = type_sv.split(':')[0].split(']')[1]     #ALT]CHR2:POSTION]
+                    else:
+                        continue
                             
                     if chrom2 not in list(dict_of_chrom.keys()): continue
                     else: 
