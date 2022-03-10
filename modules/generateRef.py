@@ -122,7 +122,12 @@ def create_ref(genome, set_of_sv, l_adj):
                 #for inversions
                 elif type_sv == '<INV>' or svtype == 'INV':
                     start = int(start)
-                    end = int(info.split(';END=')[1].split(';')[0])
+                    if info.startswith('END='):
+                        end = int(info.split('END=')[1].split(';')[0])
+                    elif ';END=' in info:
+                        end = int(info.split(';END=')[1].split(';')[0])
+                    else:
+                        continue
                     length = end - start
                      
                     # focus on >=50bp length inversions
