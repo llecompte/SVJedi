@@ -397,19 +397,31 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                             outDecision.write(new_line + "\n")
                     
                     else: # else if previous FORMAT do not correspond to SVJedi genotype FORMAT
-                        line_without_genotype = line.split("\t")[0:8]
+                        input_format = line.rstrip('\n').split('\t')[8]
+                        output_format = ['.'] * len(input_format.split(':'))
+
+                        list_index = []
+                        if 'GT' in input_format:
+                            index = input_format.split(':').index('GT')
+                            print(index)
+                            output_format[index] = genotype 
+                            
+                        if 'DP' in input_format:
+                            index = input_format.split(':').index('DP')
+                            output_format[index] = str(round(sum(nbAln), 3)) 
+                            
+                        if 'AD' in input_format:
+                            index = input_format.split(':').index('AD')
+                            output_format[index] = str(numbers)
+                            
+                        if 'PL' in input_format:
+                            index = input_format.split(':').index('PL')
+                            output_format[index] = proba
+                            
                         new_line = (
-                            "\t".join(line_without_genotype)
+                            line.rstrip('\n')
                             + "\t"
-                            + svjedi_genotype_format
-                            + "\t"
-                            + genotype
-                            + ":"
-                            + str(round(sum(nbAln), 3))
-                            + ":"
-                            + str(numbers)
-                            + ":"
-                            + str(','.join(proba))
+                            + str(':'.join(output_format))
                         )
                         outDecision.write(new_line + "\n")
                 
