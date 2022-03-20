@@ -395,7 +395,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                                 + str(','.join(proba))
                             )
                             outDecision.write(new_line + "\n")
-                    
+                                        
                     else: # else if previous FORMAT do not correspond to SVJedi genotype FORMAT
                         input_format = line.rstrip('\n').split('\t')[8]
                         output_format = ['.'] * len(input_format.split(':'))
@@ -403,7 +403,6 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                         list_index = []
                         if 'GT' in input_format:
                             index = input_format.split(':').index('GT')
-                            print(index)
                             output_format[index] = genotype 
                             
                         if 'DP' in input_format:
