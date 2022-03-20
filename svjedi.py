@@ -67,6 +67,9 @@ def parse_arguments(args):
         default=3,
         help="Minimum number of alignments to genotype a SV (default: 3>=)",
     )
+    
+    parser.add_argument("--conserve", metavar="<converse input FORMAT field>", choices=('True', 'False'), default='False', help="SVJedi FORMAT (GT, DP, AD, PL) won't be included if not in input FORMAT field")
+
 
     parser.add_argument(
         "-d",
@@ -143,6 +146,7 @@ def main(args):
     d_over = args.dover[0]
     d_end = args.dend[0]
     l_adj = args.ladj[0]
+    conserve = args.conserve
 
     # generate ref sequence
     if launch_ref is True:
@@ -183,7 +187,7 @@ def main(args):
         outErr.close()
 
     # compute genotype
-    genotype.genotype(paf_file, vcf_file, output_file, min_support, d_over, d_end, l_adj)
+    genotype.genotype(paf_file, vcf_file, output_file, min_support, d_over, d_end, l_adj, conserve)
 
 
 if __name__ == "__main__":

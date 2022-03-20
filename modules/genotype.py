@@ -54,9 +54,10 @@ def main(args):
         metavar="<minNbAln>",
         type=int,
         default=3,
-        help="Minimum number of alignments to genotype a SV (default: 3>=)",
-    )
-
+        help="Minimum number of alignments to genotype a SV (default: 3>=)")
+        
+    parser.add_argument("--conserve", metavar="<converse input FORMAT field>", choices=('True', 'False'), default='False', help="SVJedi FORMAT (GT, DP, AD, PL) won't be included if not in input FORMAT field")
+    
     args = parser.parse_args()
 
     # check if outputfile
@@ -71,10 +72,11 @@ def main(args):
     d_over = args.dover[0]
     d_end = args.dend[0]
     l_adj = args.ladj[0]
-    genotype(paffile, vcffile, output, min_support, d_over, d_end, l_adj)
+    conserve = args.conserve
+    genotype(paffile, vcffile, output, min_support, d_over, d_end, l_adj, conserve)
 
 
-def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, l_adj):
+def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, l_adj, conserve):
     """ Select alignment if it overlaps a junction and follow specific rules """ 
     dict_of_informative_aln = {}
     dict_for_ambiguous_reads = {}
@@ -132,7 +134,7 @@ def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, l_ad
                     elif element[0] == "r":
                         dict_of_informative_aln[region][0].remove(fragment)
     
-    decision_vcf(dict_of_informative_aln, vcf_without_gt, outputfile, min_aln, l_adj)
+    decision_vcf(dict_of_informative_aln, vcf_without_gt, outputfile, min_aln, l_adj, conserve)
 
 
 def fill_sv_dict(a, dictReadAtJunction):
@@ -245,7 +247,7 @@ def type_format(inputVCF, svjedi_gt_format):
 
     #return type scenario
 
-def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
+def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj, conserve):
     """ Output in VCF format and take genotype decision """
     
     getcontext().prec = 28
@@ -384,22 +386,8 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                 else:  
                     input_format = line.rstrip('\n').split('\t')[8].split(':')
                     svjedi_format = ('GT','DP','AD','PL')
-                                                      
-                    if identical_format: #check if previous FORMAT correspond to SVJedi genotype FORMAT
-                            new_line = (
-                                line.rstrip("\n")
-                                + "\t"
-                                + genotype
-                                + ":"
-                                + str(round(sum(nbAln), 3))
-                                + ":"
-                                + str(numbers)
-                                + ":"
-                                + str(','.join(proba))
-                            )
-                            outDecision.write(new_line + "\n")
-                                        
-                    else: # else if previous FORMAT do not correspond to SVJedi genotype FORMAT
+                                            
+                    if conserve == 'True':
                         output_format = ['.'] * len(input_format)
 
                         list_index = []
@@ -417,7 +405,7 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                             
                         if 'PL' in input_format:
                             index = input_format.index('PL')
-                            output_format[index] = proba
+                            output_format[index] = str(','.join(proba))
                             
                         new_line = (
                             line.rstrip('\n')
@@ -425,6 +413,101 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                             + str(':'.join(output_format))
                         )
                         outDecision.write(new_line + "\n")
+                        
+                                                      
+                    elif identical_format: #check if previous FORMAT correspond to SVJedi genotype FORMAT
+                            new_line = (
+                                line.rstrip("\n")
+                                + "\t"
+                                + genotype
+                                + ":"
+                                + str(round(sum(nbAln), 3))
+                                + ":"
+                                + str(numbers)
+                                + ":"
+                                + str(','.join(proba))
+                            )
+                            outDecision.write(new_line + "\n")
+                                        
+                    
+                    elif not identical_format and not set(svjedi_format).isdisjoint(input_format):
+                        #lesquels sont déjà dedans?
+                        list_index = [None] * len(svjedi_format)
+                                                
+                        if 'GT' in input_format:
+                            list_index[0] = input_format.index('GT')
+                            
+                        if 'DP' in input_format:
+                            list_index[1] = input_format.index('DP')
+                            
+                        if 'AD' in input_format:
+                            list_index[2] = input_format.index('AD')
+                            
+                        if 'PL' in input_format:
+                            list_index[3] = input_format.index('PL')                        
+                        
+                        format_field = input_format
+                        spe_svjedi=[i for i in range(len(list_index)) if list_index[i] == None]
+                        
+                        for a in spe_svjedi:
+                            list_index[a] = len(format_field)
+                            format_field.append(svjedi_format[a])
+
+                        n_called_sample = len(line.split('\t')) - 9
+                        called_sample = str()
+
+                        for n in range(n_called_sample):
+                            list_empty_field = ['.'] * len(spe_svjedi)
+                            sample_format = line.rstrip('\n').split('\t')[9+n] + ':' + ':'.join(list_empty_field)
+                            called_sample += '\t' + sample_format
+                        
+                        
+                        output_format = ['.'] * len(format_field) 
+                        output_format[list_index[0]] = genotype #GT
+                        output_format[list_index[1]] = str(round(sum(nbAln), 3)) #DP
+                        output_format[list_index[2]] = str(numbers) #AD
+                        output_format[list_index[3]] = str(','.join(proba)) #PL
+
+                        
+                        new_line = (
+                             '\t'.join(line.rstrip('\n').split('\t')[0:8])
+                            + '\t'
+                            + ':'.join(format_field) 
+                            + called_sample
+                            + '\t'
+                            + str(':'.join(output_format))
+                        )
+                        outDecision.write(new_line + "\n")
+
+    
+                    else:
+                        # print("Message: Your input VCF doesn't share any SVJedi output format (i.e. GT, DP, AD, PL)")
+                        # print("SVJedi's output added to the input FORMAT field ':GT:DP:AD:PL'\n")
+                        
+                        format_field = input_format
+                        format_field.extend(list(svjedi_format))
+                        
+                        n_called_sample = len(line.split('\t')) - 9
+                        called_sample = str()
+
+                        for n in range(n_called_sample):
+                            sample_format = line.rstrip('\n').split('\t')[9+n] + ':.:.:.:.' #seen no FORMAT field in common
+                            called_sample += '\t' + sample_format
+                        
+                        output_format = ['.'] * len(input_format) 
+                        output_format.extend([genotype, str(round(sum(nbAln), 3)), str(numbers), str(','.join(proba))]) #svjedi output genotype
+                        
+                        new_line = (
+                            '\t'.join(line.rstrip('\n').split('\t')[0:8])
+                            + '\t'
+                            + ":".join(format_field)
+                            + called_sample
+                            + '\t'
+                            + str(':'.join(output_format))
+                        )
+                        outDecision.write(new_line + "\n")
+                        
+                        
                 
 
                     
