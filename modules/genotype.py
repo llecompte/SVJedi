@@ -45,7 +45,7 @@ def main(args):
     parser.add_argument("-dover", metavar="<dist_overlap>", nargs=1, type=int, default=[100], help="breakpoint distance overlap")
     
     parser.add_argument("-dend", metavar="<dist_end>", nargs=1, type=int, default=[100], help="soft clipping length allowed for semi global alingments")
-
+    
     parser.add_argument("-ladj", metavar="<allele_size>", nargs=1, type=int, default=[5000], help="Sequence allele adjacencies at each side of the SV")
 
     parser.add_argument(
@@ -56,7 +56,9 @@ def main(args):
         default=3,
         help="Minimum number of alignments to genotype a SV (default: 3>=)")
         
-    parser.add_argument("--conserve", metavar="<converse input FORMAT field>", choices=('True', 'False'), default='False', help="SVJedi FORMAT (GT, DP, AD, PL) won't be included if not in input FORMAT field")
+    parser.add_argument("--conserve", metavar="<converseinputFORMATfield>", choices=('True', 'False'), default='False', help="SVJedi FORMAT (GT, DP, AD, PL) won't be included if not in input FORMAT field")
+    parser.add_argument("-n", "--name", metavar="<samplename>", nargs=1, type = str, default=['SAMPLE'], help="Name of the sample to genotype")
+    
     
     args = parser.parse_args()
 
@@ -73,10 +75,11 @@ def main(args):
     d_end = args.dend[0]
     l_adj = args.ladj[0]
     conserve = args.conserve
-    genotype(paffile, vcffile, output, min_support, d_over, d_end, l_adj, conserve)
+    name = args.name[0]    
+    genotype(paffile, vcffile, output, min_support, d_over, d_end, l_adj, conserve, name)
 
 
-def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, l_adj, conserve):
+def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, l_adj, conserve, name):
     """ Select alignment if it overlaps a junction and follow specific rules """ 
     dict_of_informative_aln = {}
     dict_for_ambiguous_reads = {}
@@ -134,7 +137,7 @@ def genotype(inputfile, vcf_without_gt, outputfile, min_aln, d_over, d_end, l_ad
                     elif element[0] == "r":
                         dict_of_informative_aln[region][0].remove(fragment)
     
-    decision_vcf(dict_of_informative_aln, vcf_without_gt, outputfile, min_aln, l_adj, conserve)
+    decision_vcf(dict_of_informative_aln, vcf_without_gt, outputfile, min_aln, l_adj, conserve, name)
 
 
 def fill_sv_dict(a, dictReadAtJunction):
@@ -247,7 +250,7 @@ def type_format(inputVCF, svjedi_gt_format):
 
     #return type scenario
 
-def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj, conserve):
+def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj, conserve, name):
     """ Output in VCF format and take genotype decision """
     
     getcontext().prec = 28
@@ -268,13 +271,10 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj, 
 
                 if "FORMAT" in line:
                     identical_format = type_format(inputVCF, svjedi_genotype_format)
-                    if identical_format:
-                        outDecision.write(line.rstrip("\n") + "\tSAMPLE\n") #keep previous SAMPLE(S) and add new SAMPLE column
-                    else:
-                        outDecision.write("\t".join(line.split('\t')[:8 ]) + "\t" + "\t".join(["FORMAT", "SAMPLE"]) + "\n") #remove previous FORMAT and SAMPLE(S) columns
+                    outDecision.write(line.rstrip("\n") + "\t" + name + "\n") #keep previous SAMPLE(S) and add new SAMPLE column
                                         
                 elif len(line.split('\t'))<=8:
-                    outDecision.write(line.rstrip('\n') + '\t' + '\t'.join(["FORMAT", "SAMPLE"]) + '\n')
+                    outDecision.write(line.rstrip('\n') + '\t' + '\t'.join(["FORMAT", name]) + '\n')
 
             else:
                 in_chrom, in_start, _, __, in_type, ___, ____, in_info, *_ = line.rstrip("\n").split("\t")
