@@ -381,7 +381,10 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                     )
                     outDecision.write(new_line + "\n")
 
-                else:                    
+                else:  
+                    input_format = line.rstrip('\n').split('\t')[8].split(':')
+                    svjedi_format = ('GT','DP','AD','PL')
+                                                      
                     if identical_format: #check if previous FORMAT correspond to SVJedi genotype FORMAT
                             new_line = (
                                 line.rstrip("\n")
@@ -397,24 +400,23 @@ def decision_vcf(dictReadAtJunction, inputVCF, outputDecision, minNbAln, l_adj):
                             outDecision.write(new_line + "\n")
                                         
                     else: # else if previous FORMAT do not correspond to SVJedi genotype FORMAT
-                        input_format = line.rstrip('\n').split('\t')[8]
-                        output_format = ['.'] * len(input_format.split(':'))
+                        output_format = ['.'] * len(input_format)
 
                         list_index = []
-                        if 'GT' in input_format.split(':'):
-                            index = input_format.split(':').index('GT')
+                        if 'GT' in input_format:
+                            index = input_format.index('GT')
                             output_format[index] = genotype 
                             
-                        if 'DP' in input_format.split(':'):
-                            index = input_format.split(':').index('DP')
+                        if 'DP' in input_format:
+                            index = input_format.index('DP')
                             output_format[index] = str(round(sum(nbAln), 3)) 
                             
-                        if 'AD' in input_format.split(':'):
-                            index = input_format.split(':').index('AD')
+                        if 'AD' in input_format:
+                            index = input_format.index('AD')
                             output_format[index] = str(numbers)
                             
-                        if 'PL' in input_format.split(':'):
-                            index = input_format.split(':').index('PL')
+                        if 'PL' in input_format:
+                            index = input_format.index('PL')
                             output_format[index] = proba
                             
                         new_line = (
