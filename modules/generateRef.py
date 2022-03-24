@@ -95,6 +95,8 @@ def create_ref(genome, set_of_sv, l_adj):
                 else:
                     svtype = '' 
                 
+                alt_field = alt_field.split(",")[0]  # in case of several alternative alleles (can happen in merged VCF), only the first one is used.
+                
                 #for deletions
                 if alt_field == "<DEL>" or svtype == 'DEL':
                 
