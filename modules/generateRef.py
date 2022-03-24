@@ -81,11 +81,11 @@ def create_ref(genome, set_of_sv, l_adj):
         for line in svFile:
             if not line.startswith("#"):
                 if len(line.split("\t")) > 6:
-                    chrom, start, _, __, type_sv, ___, ____, info, *_ = line.rstrip(
+                    chrom, start, _, __, alt_field, ___, ____, info, *_ = line.rstrip(
                         "\n"
                     ).split("\t")
                 else:
-                    chrom, start, _, __, type_sv, ___, ____, info = line.rstrip(
+                    chrom, start, _, __, alt_field, ___, ____, info = line.rstrip(
                         "\n"
                     ).split("\t")
                 
@@ -96,7 +96,7 @@ def create_ref(genome, set_of_sv, l_adj):
                     svtype = '' 
                 
                 #for deletions
-                if type_sv == "<DEL>" or svtype == 'DEL':
+                if alt_field == "<DEL>" or svtype == 'DEL':
                 
                     start = int(start)
                     if info.split(';')[-1].startswith('SVLEN='):
@@ -113,14 +113,14 @@ def create_ref(genome, set_of_sv, l_adj):
                 #for insertion
                 elif svtype == 'INS':
                     start = int(start)
-                    length = len(type_sv)
+                    length = len(alt_field)
                                 
                     # focus on >=50bp length insertion
                     if length >= 50:
-                        list_of_insertions.append((chrom, start, length, type_sv))
+                        list_of_insertions.append((chrom, start, length, alt_field))
 
                 #for inversions
-                elif type_sv == '<INV>' or svtype == 'INV':
+                elif alt_field == '<INV>' or svtype == 'INV':
                     start = int(start)
                     if info.startswith('END='):
                         end = int(info.split('END=')[1].split(';')[0])
@@ -139,23 +139,23 @@ def create_ref(genome, set_of_sv, l_adj):
                     start = int(start)
                     if 'CHR2' in info: 
                         chrom2 = info.split('CHR2=')[1].split(';')[0]
-                    elif '[' in type_sv:
-                            chrom2 = type_sv.split(':')[0].split('[')[1]     #ALT[CHR2:POSTION[
-                    elif ']' in type_sv:
-                            chrom2 = type_sv.split(':')[0].split(']')[1]     #ALT]CHR2:POSTION]
+                    elif '[' in alt_field:
+                            chrom2 = alt_field.split(':')[0].split('[')[1]     #ALT[CHR2:POSTION[
+                    elif ']' in alt_field:
+                            chrom2 = alt_field.split(':')[0].split(']')[1]     #ALT]CHR2:POSTION]
                     else:
                         continue
                             
                     if chrom2 not in list(dict_of_chrom.keys()): continue
                     else: 
-                        trans_case = translocation_cases(type_sv) #determine the translocation case
+                        trans_case = translocation_cases(alt_field) #determine the translocation case
                         
                         if ';END=' in info: 
                             end = int(info.split(';END=')[1].split(';')[0])
-                        elif '[' in type_sv:
-                            end = int(type_sv.split(':')[1].split('[')[0])     #ALT[CHR2:POSTION[
-                        elif ']' in type_sv:
-                            end = int(type_sv.split(':')[1].split(']')[0])     #ALT]CHR2:POSTION]
+                        elif '[' in alt_field:
+                            end = int(alt_field.split(':')[1].split('[')[0])     #ALT[CHR2:POSTION[
+                        elif ']' in alt_field:
+                            end = int(alt_field.split(':')[1].split(']')[0])     #ALT]CHR2:POSTION]
                             
                         list_of_translocations.append((chrom, start, chrom2, end, trans_case))
                         
